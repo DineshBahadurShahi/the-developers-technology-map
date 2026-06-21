@@ -1,0 +1,1357 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0f0f11;--sur:#16161a;--sur2:#1e1e24;--bdr:#2a2a32;
+  --tx:#e8e6f0;--mu:#8b8a99;--ac:#7c6ff7;--ac2:#5dd8b5;
+  --am:#f5a623;--co:#f07060;--inf:#4a9eff;
+}
+body{font-family:system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--tx);line-height:1.7;font-size:15px;overflow-x:hidden}
+
+#shell{display:flex;height:600px;overflow:hidden;position:relative}
+
+#sidebar{width:256px;background:var(--sur);border-right:1px solid var(--bdr);display:flex;flex-direction:column;flex-shrink:0;transition:transform .28s}
+.sb-header{padding:14px 16px;border-bottom:1px solid var(--bdr);display:flex;align-items:center;gap:10px}
+.sb-logo{width:30px;height:30px;background:var(--ac);border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#fff;flex-shrink:0}
+.sb-name{font-size:13px;font-weight:600;color:var(--tx);line-height:1.25}
+.sb-pub{font-size:11px;color:var(--mu)}
+.sb-search{padding:10px 12px;border-bottom:1px solid var(--bdr)}
+.sb-search input{width:100%;background:var(--sur2);border:1px solid var(--bdr);border-radius:6px;padding:5px 10px;font-size:12px;color:var(--tx);outline:none}
+.sb-search input:focus{border-color:var(--ac)}
+.sb-search input::placeholder{color:var(--mu)}
+.sb-nav{flex:1;overflow-y:auto;padding:6px 0}
+.np{padding:3px 12px 2px;font-size:10px;font-weight:700;letter-spacing:.08em;color:var(--mu);text-transform:uppercase;margin-top:8px}
+.ni{display:block;padding:5px 12px;font-size:12px;color:var(--mu);cursor:pointer;border-left:2px solid transparent;transition:all .12s;user-select:none}
+.ni:hover{color:var(--tx);background:var(--sur2)}
+.ni.active{color:var(--ac);border-left-color:var(--ac);background:rgba(124,111,247,.07)}
+.ni.hidden{display:none}
+
+#main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+#pbar{height:3px;background:var(--bdr);flex-shrink:0}
+#pfill{height:100%;width:0%;background:var(--ac);transition:width .1s}
+#scroll{flex:1;overflow-y:auto;scroll-behavior:smooth}
+
+.page{display:none;min-height:100%}
+.page.active{display:block}
+
+.cover-wrap{min-height:580px;display:flex;flex-direction:column;justify-content:center;padding:56px 48px;position:relative;overflow:hidden}
+.cover-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(124,111,247,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(124,111,247,.05) 1px,transparent 1px);background-size:44px 44px;pointer-events:none}
+.cover-badge{font-size:11px;font-weight:700;letter-spacing:.1em;color:var(--ac);text-transform:uppercase;border:1px solid rgba(124,111,247,.3);border-radius:100px;padding:4px 14px;display:inline-block;margin-bottom:24px}
+.cover-h1{font-size:38px;font-weight:700;line-height:1.15;margin-bottom:10px}
+.cover-h1 span{color:var(--ac)}
+.cover-sub{font-size:17px;color:var(--mu);margin-bottom:28px;max-width:400px;line-height:1.55}
+.cover-by{font-size:14px;color:var(--mu);margin-bottom:4px}
+.cover-by strong{color:var(--tx)}
+.cover-stats{display:flex;gap:16px;margin:28px 0;flex-wrap:wrap}
+.cstat{background:var(--sur2);border:1px solid var(--bdr);border-radius:8px;padding:12px 18px;text-align:center}
+.cstat .n{font-size:20px;font-weight:700;color:var(--ac)}
+.cstat .l{font-size:11px;color:var(--mu);margin-top:2px}
+.cover-btns{display:flex;gap:10px;margin-top:28px;flex-wrap:wrap}
+.btn-p{background:var(--ac);color:#fff;border:none;padding:10px 22px;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;transition:opacity .15s}
+.btn-p:hover{opacity:.88}
+.btn-s{background:transparent;color:var(--tx);border:1px solid var(--bdr);padding:10px 22px;border-radius:8px;font-size:14px;cursor:pointer;transition:background .15s}
+.btn-s:hover{background:var(--sur2)}
+.cover-quote{margin-top:40px;padding-top:24px;border-top:1px solid var(--bdr);max-width:500px;font-size:13px;color:var(--mu);font-style:italic}
+.cover-quote strong{color:var(--tx);font-style:normal}
+
+.fm-page{padding:44px 48px;max-width:700px}
+.fm-eyebrow{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--ac);margin-bottom:10px}
+.fm-title{font-size:26px;font-weight:700;margin-bottom:20px;color:var(--tx)}
+.fm-body{font-size:15px;color:rgba(232,230,240,.82);line-height:1.75;margin-bottom:16px;max-width:580px}
+.fm-body strong{color:var(--tx);font-weight:600}
+
+.author-card{display:flex;gap:20px;align-items:flex-start;background:var(--sur2);border:1px solid var(--bdr);border-radius:12px;padding:20px 24px;margin:20px 0;max-width:560px}
+.author-avatar{width:64px;height:64px;background:rgba(124,111,247,.2);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:700;color:var(--ac);flex-shrink:0}
+.author-info .name{font-size:17px;font-weight:600;color:var(--tx);margin-bottom:4px}
+.author-info .handle{font-size:13px;color:var(--ac);margin-bottom:8px}
+.author-info .bio{font-size:13px;color:var(--mu);line-height:1.6}
+
+.toc-part{margin-bottom:16px}
+.toc-part-label{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--mu);padding:6px 0 4px;border-bottom:1px solid var(--bdr);margin-bottom:6px}
+.toc-item{display:flex;align-items:center;gap:10px;padding:5px 0;font-size:13px;color:rgba(232,230,240,.75);cursor:pointer;transition:color .12s}
+.toc-item:hover{color:var(--ac)}
+.toc-item .toc-num{font-size:11px;color:var(--mu);min-width:20px}
+.toc-item .toc-dot{width:4px;height:4px;background:var(--bdr);border-radius:50%;flex-shrink:0}
+
+.eco-svg{background:var(--sur2);border:1px solid var(--bdr);border-radius:10px;overflow:hidden;margin:20px 0}
+
+.ch-page{padding:40px 48px}
+.ch-ey{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--ac);margin-bottom:8px}
+.ch-title{font-size:28px;font-weight:700;line-height:1.22;margin-bottom:10px;color:var(--tx)}
+.ch-desc{font-size:15px;color:var(--mu);max-width:540px;line-height:1.6;margin-bottom:0}
+.ch-hdr{margin-bottom:32px;padding-bottom:22px;border-bottom:1px solid var(--bdr)}
+h2{font-size:19px;font-weight:600;margin:28px 0 10px;color:var(--tx)}
+h3{font-size:15px;font-weight:600;margin:20px 0 7px;color:var(--tx)}
+p{color:rgba(232,230,240,.83);margin-bottom:13px;max-width:620px}
+strong{color:var(--tx);font-weight:600}
+code{background:var(--sur2);border:1px solid var(--bdr);border-radius:4px;padding:1px 6px;font-size:12px;color:var(--ac2);font-family:monospace}
+
+.callout{border-left:3px solid var(--ac);background:rgba(124,111,247,.07);border-radius:0 8px 8px 0;padding:13px 17px;margin:18px 0;max-width:620px}
+.callout.green{border-color:var(--ac2);background:rgba(93,216,181,.07)}
+.callout.amber{border-color:var(--am);background:rgba(245,166,35,.07)}
+.callout.red{border-color:var(--co);background:rgba(240,112,96,.07)}
+.cl{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:5px;color:var(--ac)}
+.callout.green .cl{color:var(--ac2)}
+.callout.amber .cl{color:var(--am)}
+.callout.red .cl{color:var(--co)}
+.callout p{max-width:none;margin:0;color:var(--tx)}
+
+.cg{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;margin:16px 0;max-width:620px}
+.card{background:var(--sur2);border:1px solid var(--bdr);border-radius:10px;padding:14px;transition:border-color .12s}
+.card:hover{border-color:var(--ac)}
+.card-t{font-size:13px;font-weight:600;color:var(--tx);margin-bottom:4px}
+.card-d{font-size:12px;color:var(--mu);line-height:1.5}
+
+.tt{width:100%;max-width:620px;border-collapse:collapse;margin:16px 0;font-size:13px}
+.tt th{text-align:left;padding:7px 11px;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--mu);border-bottom:1px solid var(--bdr)}
+.tt td{padding:9px 11px;border-bottom:1px solid rgba(42,42,50,.6);vertical-align:top;color:rgba(232,230,240,.83)}
+.tt tr:last-child td{border-bottom:none}
+.tt tr:hover td{background:var(--sur2)}
+.bpurp{display:inline-block;padding:2px 8px;border-radius:100px;font-size:11px;font-weight:600;background:rgba(124,111,247,.2);color:var(--ac)}
+.bgreen{display:inline-block;padding:2px 8px;border-radius:100px;font-size:11px;font-weight:600;background:rgba(93,216,181,.2);color:var(--ac2)}
+.bamb{display:inline-block;padding:2px 8px;border-radius:100px;font-size:11px;font-weight:600;background:rgba(245,166,35,.2);color:var(--am)}
+.bred{display:inline-block;padding:2px 8px;border-radius:100px;font-size:11px;font-weight:600;background:rgba(240,112,96,.2);color:var(--co)}
+
+.pills{display:flex;flex-wrap:wrap;gap:7px;margin:14px 0}
+.pill{background:var(--sur2);border:1px solid var(--bdr);border-radius:100px;padding:4px 11px;font-size:12px;color:var(--mu)}
+
+.tl{max-width:580px;margin:18px 0}
+.tli{display:flex;gap:14px;margin-bottom:18px}
+.tld{width:26px;height:26px;background:var(--sur2);border:2px solid var(--ac);border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:var(--ac);margin-top:2px}
+.tlt{font-size:13px;font-weight:600;color:var(--tx);margin-bottom:3px}
+.tlb{font-size:12px;color:var(--mu);line-height:1.5}
+
+.sum{background:var(--sur2);border:1px solid var(--bdr);border-radius:10px;padding:18px 22px;margin:22px 0;max-width:620px}
+.sum-t{font-size:11px;font-weight:700;color:var(--ac);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px}
+.sum p{margin:0;font-size:14px;color:rgba(232,230,240,.83)}
+
+.ch-nav{display:flex;justify-content:space-between;margin-top:44px;padding-top:22px;border-top:1px solid var(--bdr)}
+.nb{background:var(--sur2);border:1px solid var(--bdr);border-radius:8px;padding:9px 16px;font-size:13px;color:var(--tx);cursor:pointer;transition:all .12s}
+.nb:hover{border-color:var(--ac);color:var(--ac)}
+.nb.off{opacity:.3;cursor:not-allowed;pointer-events:none}
+
+#mtog{display:none;position:absolute;top:10px;left:10px;z-index:20;background:var(--sur2);border:1px solid var(--bdr);border-radius:6px;padding:5px 9px;cursor:pointer;font-size:13px;color:var(--tx)}
+@media(max-width:600px){
+  #sidebar{position:absolute;z-index:15;height:600px;transform:translateX(-100%)}
+  #sidebar.open{transform:translateX(0)}
+  #mtog{display:block}
+  .ch-page,.fm-page{padding:40px 18px 20px}
+  .cover-wrap{padding:48px 18px 24px}
+  .cover-h1{font-size:26px}
+  .ch-title,.fm-title{font-size:20px}
+}
+</style>
+
+<div id="shell">
+<button id="mtog" onclick="document.getElementById('sidebar').classList.toggle('open')">☰</button>
+
+<nav id="sidebar">
+  <div class="sb-header">
+    <div class="sb-logo">D</div>
+    <div><div class="sb-name">Dev Tech Map</div><div class="sb-pub">CodeWithDin</div></div>
+  </div>
+  <div class="sb-search"><input type="text" placeholder="Search chapters..." oninput="filterNav(this.value)"></div>
+  <div class="sb-nav" id="navlist">
+    <div class="np">Front Matter</div>
+    <div class="ni" data-p="author" onclick="go('author',this)">About the Author</div>
+    <div class="ni" data-p="codewithdin" onclick="go('codewithdin',this)">About CodeWithDin</div>
+    <div class="ni" data-p="howto" onclick="go('howto',this)">How to Use This Book</div>
+    <div class="ni" data-p="toc" onclick="go('toc',this)">Table of Contents</div>
+    <div class="ni" data-p="ecosystem" onclick="go('ecosystem',this)">Technology Ecosystem Map</div>
+    <div class="np">Part 1 — Big Picture</div>
+    <div class="ni" data-p="howsoftware" onclick="go('howsoftware',this)">How Software Works</div>
+    <div class="ni" data-p="journey" onclick="go('journey',this)">Journey of a Request</div>
+    <div class="np">Part 2 — Frontend</div>
+    <div class="ni" data-p="html" onclick="go('html',this)">HTML</div>
+    <div class="ni" data-p="css" onclick="go('css',this)">CSS</div>
+    <div class="ni" data-p="javascript" onclick="go('javascript',this)">JavaScript</div>
+    <div class="ni" data-p="typescript" onclick="go('typescript',this)">TypeScript</div>
+    <div class="ni" data-p="react" onclick="go('react',this)">React</div>
+    <div class="ni" data-p="nextjs" onclick="go('nextjs',this)">Next.js</div>
+    <div class="ni" data-p="tailwind" onclick="go('tailwind',this)">Tailwind CSS</div>
+    <div class="np">Part 3 — Backend</div>
+    <div class="ni" data-p="nodejs" onclick="go('nodejs',this)">Node.js</div>
+    <div class="ni" data-p="apis" onclick="go('apis',this)">APIs & REST</div>
+    <div class="ni" data-p="graphql" onclick="go('graphql',this)">GraphQL</div>
+    <div class="ni" data-p="auth" onclick="go('auth',this)">Auth & OAuth</div>
+    <div class="ni" data-p="serverless" onclick="go('serverless',this)">Serverless</div>
+    <div class="np">Part 4 — Databases</div>
+    <div class="ni" data-p="sql" onclick="go('sql',this)">SQL</div>
+    <div class="ni" data-p="postgresql" onclick="go('postgresql',this)">PostgreSQL</div>
+    <div class="ni" data-p="mongodb" onclick="go('mongodb',this)">MongoDB</div>
+    <div class="ni" data-p="redis" onclick="go('redis',this)">Redis</div>
+    <div class="np">Part 5 — Cloud</div>
+    <div class="ni" data-p="dns" onclick="go('dns',this)">DNS & Domains</div>
+    <div class="ni" data-p="vercel" onclick="go('vercel',this)">Vercel & Hosting</div>
+    <div class="ni" data-p="aws" onclick="go('aws',this)">AWS</div>
+    <div class="ni" data-p="docker" onclick="go('docker',this)">Docker</div>
+    <div class="ni" data-p="cicd" onclick="go('cicd',this)">CI/CD</div>
+    <div class="np">Part 6 — Real-Time</div>
+    <div class="ni" data-p="websockets" onclick="go('websockets',this)">WebSockets</div>
+    <div class="ni" data-p="kafka" onclick="go('kafka',this)">Kafka</div>
+    <div class="np">Part 7 — AI</div>
+    <div class="ni" data-p="llms" onclick="go('llms',this)">LLMs</div>
+    <div class="ni" data-p="aiapis" onclick="go('aiapis',this)">OpenAI · Claude · Gemini</div>
+    <div class="ni" data-p="rag" onclick="go('rag',this)">RAG & Embeddings</div>
+    <div class="ni" data-p="agents" onclick="go('agents',this)">AI Agents & MCP</div>
+    <div class="np">Part 8 — Product</div>
+    <div class="ni" data-p="payments" onclick="go('payments',this)">Payments</div>
+    <div class="ni" data-p="analytics" onclick="go('analytics',this)">Analytics</div>
+    <div class="np">Part 9 — Mobile</div>
+    <div class="ni" data-p="mobile" onclick="go('mobile',this)">React Native & Flutter</div>
+    <div class="np">Part 10 — Security</div>
+    <div class="ni" data-p="security" onclick="go('security',this)">Security Fundamentals</div>
+    <div class="np">Part 11 — System Design</div>
+    <div class="ni" data-p="ecom" onclick="go('ecom',this)">E-Commerce Architecture</div>
+    <div class="ni" data-p="aisaas" onclick="go('aisaas',this)">AI SaaS Architecture</div>
+    <div class="np">Part 12 — Future</div>
+    <div class="ni" data-p="future" onclick="go('future',this)">Future of Engineering</div>
+  </div>
+</nav>
+
+<div id="main">
+  <div id="pbar"><div id="pfill"></div></div>
+  <div id="scroll" onscroll="updP()">
+
+    <!-- COVER — shown only once -->
+    <div id="pg-cover" class="page active">
+      <div class="cover-wrap">
+        <div class="cover-grid"></div>
+        <div class="cover-badge">Version 1.0 · CodeWithDin</div>
+        <div class="cover-h1">The Developer's<br><span>Technology Map</span></div>
+        <div class="cover-sub">A visual guide to understanding the modern software ecosystem.</div>
+        <div class="cover-by">Written by <strong>Dinesh Bahadur Shahi (Din)</strong></div>
+        <div class="cover-stats">
+          <div class="cstat"><div class="n">12</div><div class="l">Parts</div></div>
+          <div class="cstat"><div class="n">40+</div><div class="l">Technologies</div></div>
+          <div class="cstat"><div class="n">5</div><div class="l">Architectures</div></div>
+          <div class="cstat"><div class="n">Visual</div><div class="l">First</div></div>
+        </div>
+        <div class="cover-btns">
+          <button class="btn-p" onclick="startReading()">Start Reading →</button>
+          <button class="btn-s" onclick="go('toc',null)">Table of Contents</button>
+        </div>
+        <div class="cover-quote">"This book is not a textbook. It is a map. The reader should constantly feel: <strong>'Now I understand where this technology fits.'</strong>"</div>
+      </div>
+    </div>
+
+    <!-- ABOUT THE AUTHOR -->
+    <div id="pg-author" class="page">
+      <div class="fm-page">
+        <div class="fm-eyebrow">Front Matter</div>
+        <div class="fm-title">About the Author</div>
+        <div class="author-card">
+          <div class="author-avatar">D</div>
+          <div class="author-info">
+            <div class="name">Dinesh Bahadur Shahi</div>
+            <div class="handle">@CodeWithDin</div>
+            <div class="bio">Software engineer, educator, and creator of CodeWithDin — a platform dedicated to helping developers understand the modern software world through visual, practical learning.</div>
+          </div>
+        </div>
+        <p class="fm-body">Din has spent years working across the full stack — from frontend interfaces to backend systems, cloud infrastructure, and AI integrations. His goal with this book is simple: give every developer the <strong>complete mental map</strong> they wish they had when they started.</p>
+        <p class="fm-body">He believes the best way to learn software is not through memorization or exam preparation — but through understanding <em>how technologies connect</em> and <em>why they exist</em>.</p>
+        <p class="fm-body">This book is the guide he wished existed when he was learning.</p>
+        <div class="ch-nav">
+          <button class="nb off">← Previous</button>
+          <button class="nb" onclick="go('codewithdin',null)">About CodeWithDin →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ABOUT CODEWITHDIN -->
+    <div id="pg-codewithdin" class="page">
+      <div class="fm-page">
+        <div class="fm-eyebrow">Front Matter</div>
+        <div class="fm-title">About CodeWithDin</div>
+        <p class="fm-body"><strong>CodeWithDin</strong> is an independent publishing and education platform for software developers. Its mission is to make complex software concepts accessible through clear writing, visual design, and real-world examples.</p>
+        <div class="cg" style="max-width:560px">
+          <div class="card"><div class="card-t">Visual Learning</div><div class="card-d">Every concept is illustrated with diagrams, maps, and architecture drawings.</div></div>
+          <div class="card"><div class="card-t">Practical Focus</div><div class="card-d">Real company examples. Startup use cases. No academic theory.</div></div>
+          <div class="card"><div class="card-t">Ecosystem Thinking</div><div class="card-d">Technologies are always shown in context — how they fit, connect, and relate.</div></div>
+          <div class="card"><div class="card-t">Regularly Updated</div><div class="card-d">New editions released as the software world evolves. Version 2.0 coming.</div></div>
+        </div>
+        <p class="fm-body">CodeWithDin publications are designed to be references you return to — not courses you finish once and forget. Keep this book open beside you as you explore the technologies it covers.</p>
+        <div class="ch-nav">
+          <button class="nb" onclick="go('author',null)">← About the Author</button>
+          <button class="nb" onclick="go('howto',null)">How to Use This Book →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- HOW TO USE THIS BOOK -->
+    <div id="pg-howto" class="page">
+      <div class="fm-page">
+        <div class="fm-eyebrow">Front Matter</div>
+        <div class="fm-title">How to Use This Book</div>
+        <p class="fm-body">This book is a <strong>reference map</strong>, not a course. You do not need to read it cover to cover in order. Use it the way you use a map — jump to wherever you are, look around, understand where things connect.</p>
+        <div class="tl">
+          <div class="tli"><div class="tld">1</div><div><div class="tlt">Start with Part 1 — The Big Picture</div><div class="tlb">Read "How Software Works" and "Journey of a Request" first. They give you the mental model everything else builds on.</div></div></div>
+          <div class="tli"><div class="tld">2</div><div><div class="tlt">Follow the learning path or jump around</div><div class="tlb">Frontend → Backend → Databases → Cloud is a natural progression. But if you're already a backend developer, jump straight to AI or System Design.</div></div></div>
+          <div class="tli"><div class="tld">3</div><div><div class="tlt">Use the Technology Connections section</div><div class="tlb">Every chapter lists which technologies connect to it. Follow those links to build your mental map.</div></div></div>
+          <div class="tli"><div class="tld">4</div><div><div class="tlt">Read the One-Minute Summary first</div><div class="tlb">Each chapter ends with a one-minute summary. Read that first to decide if you want the full chapter now or later.</div></div></div>
+          <div class="tli"><div class="tld">5</div><div><div class="tlt">Return to architecture chapters when building</div><div class="tlb">Part 11 (System Design) is most useful when you're actively designing a system. Return to it often.</div></div></div>
+        </div>
+        <div class="callout green">
+          <div class="cl">The one rule</div>
+          <p>This book is about understanding, not memorization. If you finish any chapter thinking "now I understand where this fits" — that chapter was a success.</p>
+        </div>
+        <div class="ch-nav">
+          <button class="nb" onclick="go('codewithdin',null)">← About CodeWithDin</button>
+          <button class="nb" onclick="go('toc',null)">Table of Contents →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- TABLE OF CONTENTS -->
+    <div id="pg-toc" class="page">
+      <div class="fm-page">
+        <div class="fm-eyebrow">Front Matter</div>
+        <div class="fm-title">Table of Contents</div>
+        <div class="toc-part">
+          <div class="toc-part-label">Front Matter</div>
+          <div class="toc-item" onclick="go('author',null)"><span class="toc-num">—</span><div class="toc-dot"></div>About the Author</div>
+          <div class="toc-item" onclick="go('codewithdin',null)"><span class="toc-num">—</span><div class="toc-dot"></div>About CodeWithDin</div>
+          <div class="toc-item" onclick="go('howto',null)"><span class="toc-num">—</span><div class="toc-dot"></div>How to Use This Book</div>
+          <div class="toc-item" onclick="go('ecosystem',null)"><span class="toc-num">—</span><div class="toc-dot"></div>Technology Ecosystem Map</div>
+        </div>
+        <div class="toc-part">
+          <div class="toc-part-label">Part 1 — The Big Picture</div>
+          <div class="toc-item" onclick="go('howsoftware',null)"><span class="toc-num">01</span><div class="toc-dot"></div>How Software Actually Works</div>
+          <div class="toc-item" onclick="go('journey',null)"><span class="toc-num">02</span><div class="toc-dot"></div>The Journey of a Request</div>
+        </div>
+        <div class="toc-part">
+          <div class="toc-part-label">Part 2 — Frontend</div>
+          <div class="toc-item" onclick="go('html',null)"><span class="toc-num">03</span><div class="toc-dot"></div>HTML</div>
+          <div class="toc-item" onclick="go('css',null)"><span class="toc-num">04</span><div class="toc-dot"></div>CSS</div>
+          <div class="toc-item" onclick="go('javascript',null)"><span class="toc-num">05</span><div class="toc-dot"></div>JavaScript</div>
+          <div class="toc-item" onclick="go('typescript',null)"><span class="toc-num">06</span><div class="toc-dot"></div>TypeScript</div>
+          <div class="toc-item" onclick="go('react',null)"><span class="toc-num">07</span><div class="toc-dot"></div>React</div>
+          <div class="toc-item" onclick="go('nextjs',null)"><span class="toc-num">08</span><div class="toc-dot"></div>Next.js</div>
+          <div class="toc-item" onclick="go('tailwind',null)"><span class="toc-num">09</span><div class="toc-dot"></div>Tailwind CSS</div>
+        </div>
+        <div class="toc-part">
+          <div class="toc-part-label">Part 3 — Backend</div>
+          <div class="toc-item" onclick="go('nodejs',null)"><span class="toc-num">10</span><div class="toc-dot"></div>Node.js</div>
+          <div class="toc-item" onclick="go('apis',null)"><span class="toc-num">11</span><div class="toc-dot"></div>APIs & REST</div>
+          <div class="toc-item" onclick="go('graphql',null)"><span class="toc-num">12</span><div class="toc-dot"></div>GraphQL</div>
+          <div class="toc-item" onclick="go('auth',null)"><span class="toc-num">13</span><div class="toc-dot"></div>Authentication & OAuth</div>
+          <div class="toc-item" onclick="go('serverless',null)"><span class="toc-num">14</span><div class="toc-dot"></div>Serverless</div>
+        </div>
+        <div class="toc-part">
+          <div class="toc-part-label">Part 4 — Databases</div>
+          <div class="toc-item" onclick="go('sql',null)"><span class="toc-num">15</span><div class="toc-dot"></div>SQL</div>
+          <div class="toc-item" onclick="go('postgresql',null)"><span class="toc-num">16</span><div class="toc-dot"></div>PostgreSQL</div>
+          <div class="toc-item" onclick="go('mongodb',null)"><span class="toc-num">17</span><div class="toc-dot"></div>MongoDB</div>
+          <div class="toc-item" onclick="go('redis',null)"><span class="toc-num">18</span><div class="toc-dot"></div>Redis</div>
+        </div>
+        <div class="toc-part">
+          <div class="toc-part-label">Part 5 — Cloud & Infrastructure</div>
+          <div class="toc-item" onclick="go('dns',null)"><span class="toc-num">19</span><div class="toc-dot"></div>DNS & Domains</div>
+          <div class="toc-item" onclick="go('vercel',null)"><span class="toc-num">20</span><div class="toc-dot"></div>Vercel & Modern Hosting</div>
+          <div class="toc-item" onclick="go('aws',null)"><span class="toc-num">21</span><div class="toc-dot"></div>AWS</div>
+          <div class="toc-item" onclick="go('docker',null)"><span class="toc-num">22</span><div class="toc-dot"></div>Docker</div>
+          <div class="toc-item" onclick="go('cicd',null)"><span class="toc-num">23</span><div class="toc-dot"></div>CI/CD</div>
+        </div>
+        <div class="toc-part">
+          <div class="toc-part-label">Part 6 — Real-Time</div>
+          <div class="toc-item" onclick="go('websockets',null)"><span class="toc-num">24</span><div class="toc-dot"></div>WebSockets</div>
+          <div class="toc-item" onclick="go('kafka',null)"><span class="toc-num">25</span><div class="toc-dot"></div>Kafka</div>
+        </div>
+        <div class="toc-part">
+          <div class="toc-part-label">Part 7 — Artificial Intelligence</div>
+          <div class="toc-item" onclick="go('llms',null)"><span class="toc-num">26</span><div class="toc-dot"></div>Large Language Models</div>
+          <div class="toc-item" onclick="go('aiapis',null)"><span class="toc-num">27</span><div class="toc-dot"></div>OpenAI · Claude · Gemini</div>
+          <div class="toc-item" onclick="go('rag',null)"><span class="toc-num">28</span><div class="toc-dot"></div>RAG & Embeddings</div>
+          <div class="toc-item" onclick="go('agents',null)"><span class="toc-num">29</span><div class="toc-dot"></div>AI Agents & MCP</div>
+        </div>
+        <div class="toc-part">
+          <div class="toc-part-label">Part 8 — Product Features</div>
+          <div class="toc-item" onclick="go('payments',null)"><span class="toc-num">30</span><div class="toc-dot"></div>Payments</div>
+          <div class="toc-item" onclick="go('analytics',null)"><span class="toc-num">31</span><div class="toc-dot"></div>Analytics</div>
+        </div>
+        <div class="toc-part">
+          <div class="toc-part-label">Part 9 — Mobile</div>
+          <div class="toc-item" onclick="go('mobile',null)"><span class="toc-num">32</span><div class="toc-dot"></div>React Native & Flutter</div>
+        </div>
+        <div class="toc-part">
+          <div class="toc-part-label">Part 10 — Security</div>
+          <div class="toc-item" onclick="go('security',null)"><span class="toc-num">33</span><div class="toc-dot"></div>Security Fundamentals</div>
+        </div>
+        <div class="toc-part">
+          <div class="toc-part-label">Part 11 — System Design</div>
+          <div class="toc-item" onclick="go('ecom',null)"><span class="toc-num">34</span><div class="toc-dot"></div>E-Commerce Architecture</div>
+          <div class="toc-item" onclick="go('aisaas',null)"><span class="toc-num">35</span><div class="toc-dot"></div>AI SaaS Architecture</div>
+        </div>
+        <div class="toc-part">
+          <div class="toc-part-label">Part 12 — Future</div>
+          <div class="toc-item" onclick="go('future',null)"><span class="toc-num">36</span><div class="toc-dot"></div>The Future of Engineering</div>
+        </div>
+        <div class="ch-nav">
+          <button class="nb" onclick="go('howto',null)">← How to Use</button>
+          <button class="nb" onclick="go('ecosystem',null)">Ecosystem Map →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ECOSYSTEM MAP -->
+    <div id="pg-ecosystem" class="page">
+      <div class="ch-page">
+        <div class="ch-ey">Introduction</div>
+        <div class="ch-title">Technology Ecosystem Map</div>
+        <p class="ch-desc">Every technology in this book fits one of these layers. Start here to see the whole picture before diving into any chapter.</p>
+        <div class="eco-svg">
+          <svg width="100%" viewBox="0 0 620 400" role="img"><title>Modern software ecosystem map</title><desc>Layered diagram showing all technology categories</desc>
+            <defs><marker id="ar0" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+            <rect x="230" y="12" width="160" height="34" rx="8" fill="rgba(93,216,181,.12)" stroke="rgba(93,216,181,.4)" stroke-width="1"/>
+            <text x="310" y="33" text-anchor="middle" font-size="12" font-weight="600" fill="#5dd8b5">User / Browser</text>
+            <rect x="80" y="68" width="460" height="46" rx="10" fill="rgba(93,216,181,.07)" stroke="rgba(93,216,181,.3)" stroke-width="1"/>
+            <text x="310" y="87" text-anchor="middle" font-size="11" font-weight="700" fill="#5dd8b5" letter-spacing=".05em">FRONTEND</text>
+            <text x="310" y="104" text-anchor="middle" font-size="11" fill="rgba(232,230,240,.55)">HTML · CSS · JavaScript · TypeScript · React · Next.js · Tailwind</text>
+            <rect x="80" y="136" width="460" height="46" rx="10" fill="rgba(124,111,247,.07)" stroke="rgba(124,111,247,.3)" stroke-width="1"/>
+            <text x="310" y="155" text-anchor="middle" font-size="11" font-weight="700" fill="#a89ff7" letter-spacing=".05em">BACKEND</text>
+            <text x="310" y="172" text-anchor="middle" font-size="11" fill="rgba(232,230,240,.55)">Node.js · REST APIs · GraphQL · Auth · Serverless · Microservices</text>
+            <rect x="80" y="204" width="210" height="46" rx="10" fill="rgba(245,166,35,.07)" stroke="rgba(245,166,35,.3)" stroke-width="1"/>
+            <text x="185" y="223" text-anchor="middle" font-size="11" font-weight="700" fill="#f5a623" letter-spacing=".05em">DATABASES</text>
+            <text x="185" y="240" text-anchor="middle" font-size="11" fill="rgba(232,230,240,.55)">SQL · Postgres · MongoDB · Redis</text>
+            <rect x="330" y="204" width="210" height="46" rx="10" fill="rgba(240,112,96,.07)" stroke="rgba(240,112,96,.3)" stroke-width="1"/>
+            <text x="435" y="223" text-anchor="middle" font-size="11" font-weight="700" fill="#f07060" letter-spacing=".05em">AI LAYER</text>
+            <text x="435" y="240" text-anchor="middle" font-size="11" fill="rgba(232,230,240,.55)">LLMs · RAG · Agents · Embeddings</text>
+            <rect x="80" y="272" width="460" height="46" rx="10" fill="rgba(74,158,255,.07)" stroke="rgba(74,158,255,.3)" stroke-width="1"/>
+            <text x="310" y="291" text-anchor="middle" font-size="11" font-weight="700" fill="#4a9eff" letter-spacing=".05em">CLOUD & INFRASTRUCTURE</text>
+            <text x="310" y="308" text-anchor="middle" font-size="11" fill="rgba(232,230,240,.55)">DNS · Vercel · AWS · Docker · CI/CD · Linux · Cloudflare</text>
+            <rect x="80" y="340" width="460" height="34" rx="8" fill="rgba(42,42,50,.6)" stroke="rgba(42,42,50,.8)" stroke-width="1"/>
+            <text x="310" y="362" text-anchor="middle" font-size="11" fill="rgba(232,230,240,.4)">REAL-TIME: WebSockets · Kafka · Load Balancing · Caching</text>
+            <line x1="310" y1="46" x2="310" y2="66" stroke="rgba(93,216,181,.4)" stroke-width="1" marker-end="url(#ar0)"/>
+            <line x1="310" y1="114" x2="310" y2="134" stroke="rgba(124,111,247,.4)" stroke-width="1" marker-end="url(#ar0)"/>
+            <line x1="260" y1="182" x2="185" y2="202" stroke="rgba(245,166,35,.35)" stroke-width="1" marker-end="url(#ar0)"/>
+            <line x1="360" y1="182" x2="435" y2="202" stroke="rgba(240,112,96,.35)" stroke-width="1" marker-end="url(#ar0)"/>
+            <line x1="185" y1="250" x2="240" y2="270" stroke="rgba(74,158,255,.35)" stroke-width="1" marker-end="url(#ar0)"/>
+            <line x1="435" y1="250" x2="380" y2="270" stroke="rgba(74,158,255,.35)" stroke-width="1" marker-end="url(#ar0)"/>
+          </svg>
+        </div>
+        <div class="callout green">
+          <div class="cl">How to read this map</div>
+          <p>Each layer depends on the one below it. Frontend sits on top of backend. Backend uses databases and the AI layer. Everything runs on cloud infrastructure. Real-time systems cut across all layers.</p>
+        </div>
+        <div class="ch-nav">
+          <button class="nb" onclick="go('toc',null)">← Table of Contents</button>
+          <button class="nb" onclick="go('howsoftware',null)">Part 1: How Software Works →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- HOW SOFTWARE WORKS -->
+    <div id="pg-howsoftware" class="page">
+      <div class="ch-page">
+        <div class="ch-hdr">
+          <div class="ch-ey">Part 1 · The Big Picture</div>
+          <div class="ch-title">How Software Actually Works</div>
+          <p class="ch-desc">The mental model every developer needs before learning any specific technology.</p>
+        </div>
+        <h2>The three-tier model</h2>
+        <p>Almost every piece of software follows the same pattern: something the user sees (<strong>frontend</strong>), something that processes requests (<strong>backend</strong>), and somewhere data lives (<strong>database</strong>). Instagram, Stripe, Notion, GitHub — all three tiers.</p>
+        <div class="cg">
+          <div class="card"><div class="card-t">Frontend</div><div class="card-d">What the user sees. Runs in the browser. HTML, CSS, JavaScript.</div></div>
+          <div class="card"><div class="card-t">Backend</div><div class="card-d">Processes logic and requests. Enforces rules. Node.js, APIs.</div></div>
+          <div class="card"><div class="card-t">Database</div><div class="card-d">Stores all persistent data. The source of truth. Postgres, Redis.</div></div>
+        </div>
+        <h2>What happens when you click "Send" on Slack</h2>
+        <div class="tl">
+          <div class="tli"><div class="tld">1</div><div><div class="tlt">Browser captures your input</div><div class="tlb">JavaScript reads the text field and fires the click event.</div></div></div>
+          <div class="tli"><div class="tld">2</div><div><div class="tlt">HTTPS request leaves your device</div><div class="tlb">An encrypted POST request carries your message to Slack's servers.</div></div></div>
+          <div class="tli"><div class="tld">3</div><div><div class="tlt">DNS resolves the address</div><div class="tlb">Your device asks "where is slack.com?" and gets back an IP address.</div></div></div>
+          <div class="tli"><div class="tld">4</div><div><div class="tlt">Load balancer routes the request</div><div class="tlb">Slack's infrastructure picks which backend server handles this request.</div></div></div>
+          <div class="tli"><div class="tld">5</div><div><div class="tlt">Backend saves to database</div><div class="tlb">The message is validated, stored in Postgres, and confirmation sent.</div></div></div>
+          <div class="tli"><div class="tld">6</div><div><div class="tlt">WebSocket pushes to recipients</div><div class="tlb">Everyone in the channel receives the message instantly.</div></div></div>
+        </div>
+        <div class="callout amber">
+          <div class="cl">Key insight</div>
+          <p>Every technology in this book plays one of these roles. When you learn something new, always ask: "Which step does this handle?"</p>
+        </div>
+        <div class="ch-nav">
+          <button class="nb" onclick="go('ecosystem',null)">← Ecosystem Map</button>
+          <button class="nb" onclick="go('journey',null)">Journey of a Request →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- JOURNEY -->
+    <div id="pg-journey" class="page">
+      <div class="ch-page">
+        <div class="ch-hdr">
+          <div class="ch-ey">Part 1 · The Big Picture</div>
+          <div class="ch-title">The Journey of a Request</div>
+          <p class="ch-desc">Every time you open a website, dozens of technologies collaborate in milliseconds.</p>
+        </div>
+        <div class="eco-svg">
+          <svg width="100%" viewBox="0 0 620 180" role="img"><title>HTTP request journey</title><desc>Path from browser through DNS, CDN, load balancer, backend, to database</desc>
+            <defs><marker id="ar1" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+            <rect x="14" y="72" width="86" height="42" rx="7" fill="rgba(93,216,181,.12)" stroke="rgba(93,216,181,.4)" stroke-width="1"/>
+            <text x="57" y="91" text-anchor="middle" font-size="11" font-weight="600" fill="#5dd8b5">Browser</text>
+            <text x="57" y="106" text-anchor="middle" font-size="10" fill="rgba(232,230,240,.5)">React/HTML</text>
+            <line x1="100" y1="93" x2="128" y2="66" stroke="rgba(245,166,35,.5)" stroke-width="1" marker-end="url(#ar1)"/>
+            <line x1="100" y1="100" x2="128" y2="124" stroke="rgba(74,158,255,.5)" stroke-width="1" marker-end="url(#ar1)"/>
+            <rect x="130" y="46" width="78" height="38" rx="7" fill="rgba(245,166,35,.1)" stroke="rgba(245,166,35,.4)" stroke-width="1"/>
+            <text x="169" y="64" text-anchor="middle" font-size="11" font-weight="600" fill="#f5a623">DNS</text>
+            <text x="169" y="79" text-anchor="middle" font-size="10" fill="rgba(232,230,240,.5)">lookup</text>
+            <rect x="130" y="104" width="78" height="38" rx="7" fill="rgba(74,158,255,.1)" stroke="rgba(74,158,255,.4)" stroke-width="1"/>
+            <text x="169" y="122" text-anchor="middle" font-size="11" font-weight="600" fill="#4a9eff">CDN</text>
+            <text x="169" y="137" text-anchor="middle" font-size="10" fill="rgba(232,230,240,.5)">Cloudflare</text>
+            <line x1="208" y1="93" x2="258" y2="93" stroke="rgba(232,230,240,.25)" stroke-width="1" marker-end="url(#ar1)"/>
+            <rect x="260" y="72" width="96" height="42" rx="7" fill="rgba(124,111,247,.12)" stroke="rgba(124,111,247,.4)" stroke-width="1"/>
+            <text x="308" y="91" text-anchor="middle" font-size="11" font-weight="600" fill="#a89ff7">Load</text>
+            <text x="308" y="106" text-anchor="middle" font-size="11" font-weight="600" fill="#a89ff7">Balancer</text>
+            <line x1="356" y1="86" x2="396" y2="72" stroke="rgba(124,111,247,.4)" stroke-width="1" marker-end="url(#ar1)"/>
+            <line x1="356" y1="100" x2="396" y2="114" stroke="rgba(124,111,247,.4)" stroke-width="1" marker-end="url(#ar1)"/>
+            <rect x="398" y="54" width="82" height="38" rx="7" fill="rgba(124,111,247,.1)" stroke="rgba(124,111,247,.3)" stroke-width="1"/>
+            <text x="439" y="72" text-anchor="middle" font-size="11" font-weight="600" fill="#a89ff7">Backend</text>
+            <text x="439" y="87" text-anchor="middle" font-size="10" fill="rgba(232,230,240,.5)">Node.js</text>
+            <rect x="398" y="100" width="82" height="38" rx="7" fill="rgba(124,111,247,.07)" stroke="rgba(124,111,247,.25)" stroke-width="1"/>
+            <text x="439" y="118" text-anchor="middle" font-size="11" fill="#a89ff7">Backend</text>
+            <text x="439" y="133" text-anchor="middle" font-size="10" fill="rgba(232,230,240,.5)">Node.js</text>
+            <line x1="480" y1="74" x2="516" y2="84" stroke="rgba(245,166,35,.4)" stroke-width="1" marker-end="url(#ar1)"/>
+            <line x1="480" y1="118" x2="516" y2="108" stroke="rgba(245,166,35,.4)" stroke-width="1" marker-end="url(#ar1)"/>
+            <rect x="518" y="76" width="82" height="42" rx="7" fill="rgba(245,166,35,.1)" stroke="rgba(245,166,35,.4)" stroke-width="1"/>
+            <text x="559" y="95" text-anchor="middle" font-size="11" font-weight="600" fill="#f5a623">Database</text>
+            <text x="559" y="110" text-anchor="middle" font-size="10" fill="rgba(232,230,240,.5)">Postgres</text>
+            <text x="310" y="164" text-anchor="middle" font-size="11" fill="rgba(232,230,240,.35)">One click can touch 6+ technologies in under 100ms</text>
+          </svg>
+        </div>
+        <h2>What this tells you</h2>
+        <p>Modern software is not a single program — it is a <strong>network of collaborating services</strong>. Each technology in this book handles one piece of this puzzle. Understanding where each piece fits is the purpose of this entire book.</p>
+        <div class="callout">
+          <div class="cl">The city metaphor</div>
+          <p>DNS is the address system. CDN is the post office. Backend servers are the offices doing actual work. The database is the filing room. Load balancers are the traffic directors. Each technology has a job.</p>
+        </div>
+        <div class="ch-nav">
+          <button class="nb" onclick="go('howsoftware',null)">← How Software Works</button>
+          <button class="nb" onclick="go('html',null)">HTML →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- HTML -->
+    <div id="pg-html" class="page">
+      <div class="ch-page">
+        <div class="ch-hdr">
+          <div class="ch-ey">Part 2 · Frontend</div>
+          <div class="ch-title">HTML</div>
+          <p class="ch-desc">The skeleton of every webpage. Not a programming language — a structure language.</p>
+        </div>
+        <h2>What is it?</h2>
+        <p>HTML (HyperText Markup Language) describes the <strong>structure and content</strong> of a webpage. Think of it as a building's blueprint — it defines what's there and in what order, not how it looks.</p>
+        <h2>Why does it exist?</h2>
+        <p>In 1989, Tim Berners-Lee needed a way to share scientific documents over the internet. He invented HTML so browsers could distinguish a heading from a paragraph from a link. Every other web technology is built on top of that original idea.</p>
+        <div class="callout green"><div class="cl">Real example</div><p>Every YouTube video page, Wikipedia article, and GitHub profile is HTML structuring the content. The words, images, buttons, and sections are all HTML elements.</p></div>
+        <h2>Where it fits</h2>
+        <p>HTML lives entirely in the <strong>browser</strong>. It is the structure layer. CSS styles it. JavaScript makes it interactive. React generates it dynamically. Server-side frameworks render it on the server first.</p>
+        <h2>Technology connections</h2>
+        <div class="pills"><div class="pill">CSS → styles HTML</div><div class="pill">JavaScript → manipulates HTML</div><div class="pill">React → generates HTML</div><div class="pill">Next.js → server-renders HTML</div></div>
+        <h2>Common beginner mistakes</h2>
+        <table class="tt"><thead><tr><th>Mistake</th><th>Reality</th></tr></thead><tbody>
+          <tr><td>"HTML is a programming language"</td><td>It's markup — structure, not logic.</td></tr>
+          <tr><td>Using <code>&lt;div&gt;</code> for everything</td><td>Semantic tags like <code>&lt;nav&gt;</code>, <code>&lt;main&gt;</code>, <code>&lt;article&gt;</code> help SEO and accessibility.</td></tr>
+          <tr><td>Not closing tags</td><td>Unclosed tags cause unexpected layout bugs.</td></tr>
+        </tbody></table>
+        <div class="sum"><div class="sum-t">One-Minute Summary</div><p>HTML is the structure layer of every webpage. It defines what's on the page. Every frontend technology — CSS, JavaScript, React — builds on top of it. Learn it first. The basics take 2–3 days. You'll use it every day.</p></div>
+        <div class="ch-nav">
+          <button class="nb" onclick="go('journey',null)">← Request Journey</button>
+          <button class="nb" onclick="go('css',null)">CSS →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- CSS -->
+    <div id="pg-css" class="page">
+      <div class="ch-page">
+        <div class="ch-hdr"><div class="ch-ey">Part 2 · Frontend</div><div class="ch-title">CSS</div><p class="ch-desc">CSS makes things look good. It turns a bare HTML skeleton into a beautiful interface.</p></div>
+        <h2>What is it?</h2>
+        <p>CSS (Cascading Style Sheets) controls <strong>how HTML looks</strong>: colors, fonts, layouts, spacing, animations. Without CSS, every webpage would look like a plain 1992 text document.</p>
+        <h2>Why does it exist?</h2>
+        <p>Originally styling was done inline in HTML attributes. CSS was invented to <strong>separate content from presentation</strong>. Change one CSS file and the look of every page changes instantly.</p>
+        <div class="callout green"><div class="cl">Real example</div><p>Apple's website uses a single CSS change to switch between light and dark mode. Linear, Vercel, and Stripe — their distinctive identities are entirely CSS on top of basic HTML.</p></div>
+        <div class="cg">
+          <div class="card"><div class="card-t">Flexbox</div><div class="card-d">One-dimensional layout. Rows or columns. Used everywhere.</div></div>
+          <div class="card"><div class="card-t">Grid</div><div class="card-d">Two-dimensional. Rows AND columns simultaneously.</div></div>
+          <div class="card"><div class="card-t">Responsive</div><div class="card-d">Media queries make designs adapt to screen sizes.</div></div>
+          <div class="card"><div class="card-t">Custom Props</div><div class="card-d">CSS variables for reusable values across your stylesheet.</div></div>
+        </div>
+        <h2>Technology connections</h2>
+        <div class="pills"><div class="pill">HTML → CSS styles it</div><div class="pill">Tailwind → utility-first CSS</div><div class="pill">React → CSS Modules / styled-components</div></div>
+        <div class="sum"><div class="sum-t">One-Minute Summary</div><p>CSS makes HTML beautiful. Learn Flexbox and Grid first — they unlock 90% of layouts. Without CSS you have content. With CSS you have design.</p></div>
+        <div class="ch-nav"><button class="nb" onclick="go('html',null)">← HTML</button><button class="nb" onclick="go('javascript',null)">JavaScript →</button></div>
+      </div>
+    </div>
+
+    <!-- JAVASCRIPT -->
+    <div id="pg-javascript" class="page">
+      <div class="ch-page">
+        <div class="ch-hdr"><div class="ch-ey">Part 2 · Frontend</div><div class="ch-title">JavaScript</div><p class="ch-desc">The only programming language that runs natively in the browser. The backbone of modern web development.</p></div>
+        <h2>What is it?</h2>
+        <p>JavaScript is a <strong>programming language</strong> that makes webpages interactive. It adds behavior — clicking, animations, fetching data, validating forms. Today it also runs on servers (Node.js), in mobile apps, and in AI tooling.</p>
+        <h2>Why does it exist?</h2>
+        <p>In 1995, Netscape needed form validation without a full page reload. Brendan Eich created JavaScript in 10 days. It became the only language browsers execute natively — and then the language of the entire software world.</p>
+        <div class="callout green"><div class="cl">Real example</div><p>Google search results appearing as you type — JavaScript. Twitter's like button turning red without a page reload — JavaScript. Dragging a Trello card between columns — JavaScript.</p></div>
+        <h2>Key concepts every developer must know</h2>
+        <table class="tt"><thead><tr><th>Concept</th><th>What it does</th><th>Priority</th></tr></thead><tbody>
+          <tr><td><code>async/await</code></td><td>Handle operations that take time</td><td><span class="bred">Critical</span></td></tr>
+          <tr><td>DOM manipulation</td><td>Change the page dynamically</td><td><span class="bred">Critical</span></td></tr>
+          <tr><td>Array methods</td><td><code>map</code>, <code>filter</code>, <code>reduce</code></td><td><span class="bred">Critical</span></td></tr>
+          <tr><td>Closures</td><td>Functions that remember their scope</td><td><span class="bamb">Important</span></td></tr>
+          <tr><td>Prototypes</td><td>JavaScript's inheritance model</td><td><span class="bamb">Important</span></td></tr>
+        </tbody></table>
+        <div class="sum"><div class="sum-t">One-Minute Summary</div><p>JavaScript is the language of the web. HTML is structure. CSS is style. JavaScript is behavior. It's the most-used language on Earth. Learn it deeply — everything else in frontend and full-stack builds on it.</p></div>
+        <div class="ch-nav"><button class="nb" onclick="go('css',null)">← CSS</button><button class="nb" onclick="go('typescript',null)">TypeScript →</button></div>
+      </div>
+    </div>
+
+    <!-- TYPESCRIPT -->
+    <div id="pg-typescript" class="page">
+      <div class="ch-page">
+        <div class="ch-hdr"><div class="ch-ey">Part 2 · Frontend</div><div class="ch-title">TypeScript</div><p class="ch-desc">JavaScript with a safety net. TypeScript catches your mistakes before they reach production.</p></div>
+        <h2>What is it?</h2>
+        <p>TypeScript is a <strong>superset of JavaScript</strong> that adds optional static types. Every JavaScript file is valid TypeScript. But TypeScript lets you declare that a variable is a number or a function returns a string — and it warns you when something doesn't match.</p>
+        <div class="callout green"><div class="cl">Real example</div><p>Vercel, Stripe, Airbnb, and Microsoft all use TypeScript in production. In a 500-file codebase, TypeScript prevents entire categories of bugs that tests alone can't catch.</p></div>
+        <div class="cg">
+          <div class="card"><div class="card-t">Autocomplete</div><div class="card-d">Your editor knows every property on every object.</div></div>
+          <div class="card"><div class="card-t">Refactoring</div><div class="card-d">Rename a function and TypeScript updates every call site.</div></div>
+          <div class="card"><div class="card-t">Self-documenting</div><div class="card-d">Types tell the next developer exactly what a function expects.</div></div>
+          <div class="card"><div class="card-t">Fewer bugs</div><div class="card-d">Wrong type used? Caught at dev time, not in production.</div></div>
+        </div>
+        <div class="sum"><div class="sum-t">One-Minute Summary</div><p>TypeScript is JavaScript with types. Learn JavaScript first, then add TypeScript. It makes your code safer, your editor smarter, your team more productive. In 2025, most professional projects use TypeScript by default.</p></div>
+        <div class="ch-nav"><button class="nb" onclick="go('javascript',null)">← JavaScript</button><button class="nb" onclick="go('react',null)">React →</button></div>
+      </div>
+    </div>
+
+    <!-- REACT -->
+    <div id="pg-react" class="page">
+      <div class="ch-page">
+        <div class="ch-hdr"><div class="ch-ey">Part 2 · Frontend</div><div class="ch-title">React</div><p class="ch-desc">The most popular way to build user interfaces. Created by Meta. Used by almost every major tech company.</p></div>
+        <h2>What is it?</h2>
+        <p>React is a JavaScript <strong>library for building user interfaces</strong> through components. Instead of manually updating the DOM, you describe what the UI should look like for any given state — and React handles all the updates efficiently.</p>
+        <h2>The core idea: components</h2>
+        <p>React breaks your UI into <strong>components</strong> — small, reusable pieces. A Button component. A Card component. A Navigation bar. Each manages its own state and renders its own HTML. You compose them like LEGO blocks.</p>
+        <div class="callout green"><div class="cl">Real example</div><p>Facebook, Instagram, WhatsApp Web, Airbnb, Netflix — all use React. When you click "Like" and the count changes without a page reload, React is managing that state update.</p></div>
+        <table class="tt"><thead><tr><th>Concept</th><th>What it means</th></tr></thead><tbody>
+          <tr><td>Components</td><td>Functions that return JSX (HTML-like syntax)</td></tr>
+          <tr><td>Props</td><td>Data passed into a component from its parent</td></tr>
+          <tr><td>State (<code>useState</code>)</td><td>Data that belongs to a component and can change</td></tr>
+          <tr><td>Effects (<code>useEffect</code>)</td><td>Fetch data, subscriptions, timers</td></tr>
+          <tr><td>Virtual DOM</td><td>React's mechanism for efficient UI updates</td></tr>
+        </tbody></table>
+        <div class="callout amber"><div class="cl">Common beginner mistake</div><p>Jumping into React before understanding JavaScript. React is JavaScript — if you don't know functions, arrays, and async/await, React will feel like magic. Spend a month on JS first.</p></div>
+        <div class="sum"><div class="sum-t">One-Minute Summary</div><p>React turns UI building from "find the element and change it" into "describe what it should look like." It's the most in-demand frontend skill. Learn JavaScript → React → Next.js in that order.</p></div>
+        <div class="ch-nav"><button class="nb" onclick="go('typescript',null)">← TypeScript</button><button class="nb" onclick="go('nextjs',null)">Next.js →</button></div>
+      </div>
+    </div>
+
+    <!-- NEXT.JS -->
+    <div id="pg-nextjs" class="page">
+      <div class="ch-page">
+        <div class="ch-hdr"><div class="ch-ey">Part 2 · Frontend</div><div class="ch-title">Next.js</div><p class="ch-desc">The React framework for production. Routing, server rendering, API routes, and optimization — built in.</p></div>
+        <h2>What is it?</h2>
+        <p>Next.js is a <strong>full-stack framework built on React</strong>. React gives you components. Next.js adds everything a real application needs: file-based routing, server-side rendering, API endpoints, image optimization, and performance defaults.</p>
+        <div class="cg">
+          <div class="card"><div class="card-t">App Router</div><div class="card-d">A file at /app/about/page.tsx becomes yoursite.com/about automatically.</div></div>
+          <div class="card"><div class="card-t">Server Components</div><div class="card-d">Components that render on the server. Zero JS sent to the client.</div></div>
+          <div class="card"><div class="card-t">API Routes</div><div class="card-d">Backend endpoints inside your app. No separate server needed.</div></div>
+          <div class="card"><div class="card-t">Edge Runtime</div><div class="card-d">Code that runs at CDN edge, globally, near your users.</div></div>
+        </div>
+        <div class="callout green"><div class="cl">Real example</div><p>The Vercel website, OpenAI's ChatGPT interface, TikTok's web app — all run on Next.js. It's the default choice for serious React applications in 2025.</p></div>
+        <div class="sum"><div class="sum-t">One-Minute Summary</div><p>Next.js = React + routing + server rendering + API routes + optimization. It turns React from a UI library into a complete web framework. The most popular full-stack JavaScript framework today.</p></div>
+        <div class="ch-nav"><button class="nb" onclick="go('react',null)">← React</button><button class="nb" onclick="go('tailwind',null)">Tailwind CSS →</button></div>
+      </div>
+    </div>
+
+    <!-- TAILWIND -->
+    <div id="pg-tailwind" class="page">
+      <div class="ch-page">
+        <div class="ch-hdr"><div class="ch-ey">Part 2 · Frontend</div><div class="ch-title">Tailwind CSS</div><p class="ch-desc">Write CSS without writing CSS. Utility classes directly in your HTML or JSX.</p></div>
+        <h2>What is it?</h2>
+        <p>Tailwind is a <strong>utility-first CSS framework</strong>. Instead of a class called <code>.card</code> with CSS properties, you apply small single-purpose classes directly: <code>bg-white p-4 rounded-lg flex items-center gap-3</code>. The HTML shows you exactly what it looks like.</p>
+        <div class="cg">
+          <div class="card"><div class="card-t">No naming</div><div class="card-d">Never agonize over .card-inner-wrapper again.</div></div>
+          <div class="card"><div class="card-t">No switching files</div><div class="card-d">Styles inline next to your HTML. One place to look.</div></div>
+          <div class="card"><div class="card-t">Consistent scales</div><div class="card-d">Pre-defined spacing, colors, and typography.</div></div>
+          <div class="card"><div class="card-t">Tiny output</div><div class="card-d">Purges unused CSS. Ships only what you use.</div></div>
+        </div>
+        <div class="callout green"><div class="cl">Real example</div><p>Vercel docs, shadcn/ui, and thousands of SaaS products are built with Tailwind. It pairs perfectly with React and Next.js — rarely seen without the others in 2025 codebases.</p></div>
+        <div class="sum"><div class="sum-t">One-Minute Summary</div><p>Tailwind replaces CSS files with utility classes. Learn CSS fundamentals first — then Tailwind makes you much faster. The modern default stack: Next.js + TypeScript + Tailwind.</p></div>
+        <div class="ch-nav"><button class="nb" onclick="go('nextjs',null)">← Next.js</button><button class="nb" onclick="go('nodejs',null)">Node.js →</button></div>
+      </div>
+    </div>
+
+    <!-- NODE.JS -->
+    <div id="pg-nodejs" class="page">
+      <div class="ch-page">
+        <div class="ch-hdr"><div class="ch-ey">Part 3 · Backend</div><div class="ch-title">Node.js</div><p class="ch-desc">JavaScript escaped from the browser. Node.js runs JavaScript on servers — changing the web forever.</p></div>
+        <h2>What is it?</h2>
+        <p>Node.js is a <strong>JavaScript runtime for servers</strong>. Before Node.js, JavaScript only ran in browsers. Node.js took Chrome's V8 engine and made it run on computers, servers, and in the cloud.</p>
+        <div class="callout green"><div class="cl">Real example</div><p>Netflix moved to Node.js and cut startup time by 70%. LinkedIn reduced servers from 30 to 3. Uber, PayPal, and NASA all use Node.js in their backend.</p></div>
+        <table class="tt"><thead><tr><th>Use case</th><th>Example</th></tr></thead><tbody>
+          <tr><td>REST APIs</td><td>Express.js, Fastify, Hono</td></tr>
+          <tr><td>Real-time apps</td><td>WebSocket servers, chat</td></tr>
+          <tr><td>CLI tools</td><td>npm, Vite, ESLint are all Node.js</td></tr>
+          <tr><td>Serverless functions</td><td>Vercel Functions, AWS Lambda</td></tr>
+        </tbody></table>
+        <div class="sum"><div class="sum-t">One-Minute Summary</div><p>Node.js = JavaScript on the server. It's what Next.js API routes run on. It's what npm is built on. If you know JavaScript, you already know how to write backend code with Node.js.</p></div>
+        <div class="ch-nav"><button class="nb" onclick="go('tailwind',null)">← Tailwind</button><button class="nb" onclick="go('apis',null)">APIs & REST →</button></div>
+      </div>
+    </div>
+
+    <!-- APIS -->
+    <div id="pg-apis" class="page">
+      <div class="ch-page">
+        <div class="ch-hdr"><div class="ch-ey">Part 3 · Backend</div><div class="ch-title">APIs & REST</div><p class="ch-desc">The language services use to talk to each other. Every modern application is built on APIs.</p></div>
+        <h2>What is an API?</h2>
+        <p>An API (Application Programming Interface) is a <strong>contract between two pieces of software</strong>. "Send me a request in this format, and I'll send you data in that format." Stripe's API lets you charge a card. OpenAI's API gives you an AI model.</p>
+        <h2>What is REST?</h2>
+        <p>REST is the most common <strong>style for building APIs</strong>. It uses HTTP methods to perform operations on resources: <code>GET /users/42</code> means "get me user 42." <code>DELETE /posts/7</code> means "delete post 7."</p>
+        <table class="tt"><thead><tr><th>Method</th><th>Action</th><th>Example</th></tr></thead><tbody>
+          <tr><td><span class="bgreen">GET</span></td><td>Read</td><td><code>GET /products</code></td></tr>
+          <tr><td><span class="bpurp">POST</span></td><td>Create</td><td><code>POST /orders</code></td></tr>
+          <tr><td><span class="bamb">PUT</span></td><td>Update</td><td><code>PUT /users/5</code></td></tr>
+          <tr><td><span class="bred">DELETE</span></td><td>Delete</td><td><code>DELETE /posts/3</code></td></tr>
+        </tbody></table>
+        <div class="callout green"><div class="cl">Real example</div><p>When you pay with Stripe, your app calls Stripe's REST API. When you sign in with Google, Google's OAuth API is called. You interact with REST APIs hundreds of times per day.</p></div>
+        <div class="sum"><div class="sum-t">One-Minute Summary</div><p>APIs are how software talks to software. REST is the most common pattern. You'll call APIs from your frontend and build them in your backend. Understanding REST — methods, status codes, JSON — is non-negotiable.</p></div>
+        <div class="ch-nav"><button class="nb" onclick="go('nodejs',null)">← Node.js</button><button class="nb" onclick="go('graphql',null)">GraphQL →</button></div>
+      </div>
+    </div>
+
+    <!-- GRAPHQL -->
+    <div id="pg-graphql" class="page">
+      <div class="ch-page">
+        <div class="ch-hdr"><div class="ch-ey">Part 3 · Backend</div><div class="ch-title">GraphQL</div><p class="ch-desc">Ask for exactly the data you need. Nothing more. Nothing less.</p></div>
+        <h2>What is it?</h2>
+        <p>GraphQL is a <strong>query language for APIs</strong> created by Meta. Instead of hitting multiple REST endpoints and receiving data you didn't ask for, you send one query specifying exactly which fields you need — and get back precisely that.</p>
+        <table class="tt"><thead><tr><th></th><th>REST</th><th>GraphQL</th></tr></thead><tbody>
+          <tr><td>Endpoints</td><td>One per resource</td><td>Single <code>/graphql</code></td></tr>
+          <tr><td>Data returned</td><td>Fixed shape, often excess</td><td>Exactly what you asked for</td></tr>
+          <tr><td>Multiple resources</td><td>Multiple requests</td><td>One query, nested</td></tr>
+          <tr><td>Best for</td><td>Simple CRUD, public APIs</td><td>Complex data, mobile apps</td></tr>
+        </tbody></table>
+        <div class="callout amber"><div class="cl">When you actually need it</div><p>GraphQL adds complexity. For most apps REST is simpler and sufficient. Choose GraphQL when you have complex nested data, multiple client types needing different shapes, or a strongly-typed API contract requirement.</p></div>
+        <div class="ch-nav"><button class="nb" onclick="go('apis',null)">← APIs & REST</button><button class="nb" onclick="go('auth',null)">Auth & OAuth →</button></div>
+      </div>
+    </div>
+
+    <!-- AUTH -->
+    <div id="pg-auth" class="page">
+      <div class="ch-page">
+        <div class="ch-hdr"><div class="ch-ey">Part 3 · Backend</div><div class="ch-title">Authentication & OAuth</div><p class="ch-desc">Proving identity is one of the hardest problems in software. Here's how the industry solves it.</p></div>
+        <h2>Authentication vs Authorization</h2>
+        <div class="cg">
+          <div class="card"><div class="card-t">Authentication</div><div class="card-d">"Who are you?" Verifying identity. Login with email/password or Google.</div></div>
+          <div class="card"><div class="card-t">Authorization</div><div class="card-d">"What can you do?" Checking permissions. Admins vs regular users.</div></div>
+        </div>
+        <h2>How OAuth works</h2>
+        <div class="tl">
+          <div class="tli"><div class="tld">1</div><div><div class="tlt">User clicks "Sign in with Google"</div><div class="tlb">Your app redirects to Google with your app's client ID.</div></div></div>
+          <div class="tli"><div class="tld">2</div><div><div class="tlt">Google authenticates the user</div><div class="tlb">Google handles the login. Your app never sees the password.</div></div></div>
+          <div class="tli"><div class="tld">3</div><div><div class="tlt">Google returns an auth code</div><div class="tlb">Redirects back to your app with a one-time code.</div></div></div>
+          <div class="tli"><div class="tld">4</div><div><div class="tlt">Your server exchanges it for tokens</div><div class="tlb">Access token (short-lived) and refresh token (long-lived).</div></div></div>
+          <div class="tli"><div class="tld">5</div><div><div class="tlt">User is logged in</div><div class="tlb">You store identity. They stay logged in via JWT or session.</div></div></div>
+        </div>
+        <div class="callout"><div class="cl">Auth.js</div><p>Auth.js (formerly NextAuth) is the most popular authentication library for Next.js. Add 20 lines of config and you get sign-in with Google, GitHub, Discord, and email magic links — all securely implemented.</p></div>
+        <div class="ch-nav"><button class="nb" onclick="go('graphql',null)">← GraphQL</button><button class="nb" onclick="go('serverless',null)">Serverless →</button></div>
+      </div>
+    </div>
+
+    <!-- SERVERLESS -->
+    <div id="pg-serverless" class="page">
+      <div class="ch-page">
+        <div class="ch-hdr"><div class="ch-ey">Part 3 · Backend</div><div class="ch-title">Serverless</div><p class="ch-desc">There are still servers. You just don't manage them. Serverless means "server-ful but invisible."</p></div>
+        <h2>What is it?</h2>
+        <p>Serverless means writing individual <strong>functions</strong> that run on demand. The cloud provider handles provisioning, scaling, and maintenance. You pay per invocation, not for a server running 24/7.</p>
+        <div class="cg">
+          <div class="card"><div class="card-t">Traditional Server</div><div class="card-d">Runs 24/7. You pay constantly. You manage updates and scaling yourself.</div></div>
+          <div class="card"><div class="card-t">Serverless Function</div><div class="card-d">Runs on demand. Scales automatically. Pay per call. Zero ops.</div></div>
+        </div>
+        <div class="callout green"><div class="cl">Real example</div><p>Every Next.js API route you write is a serverless function on Vercel. Stripe webhooks are serverless functions. An AI image endpoint that runs 10 seconds occasionally — perfectly suited to serverless.</p></div>
+        <div class="callout amber"><div class="cl">When to avoid serverless</div><p>Long-running processes over 15 minutes, WebSocket connections, and anything needing persistent in-memory state don't suit serverless. Use a traditional server or container for those cases.</p></div>
+        <div class="ch-nav"><button class="nb" onclick="go('auth',null)">← Auth & OAuth</button><button class="nb" onclick="go('sql',null)">SQL →</button></div>
+      </div>
+    </div>
+
+    <!-- SQL -->
+    <div id="pg-sql" class="page">
+      <div class="ch-page">
+        <div class="ch-hdr"><div class="ch-ey">Part 4 · Databases</div><div class="ch-title">SQL</div><p class="ch-desc">The language of relational databases. 50 years old and still dominant.</p></div>
+        <h2>What is it?</h2>
+        <p>SQL (Structured Query Language) is used to interact with <strong>relational databases</strong>. Data is stored in tables — rows and columns like a spreadsheet. Tables link to each other via foreign keys. You query with SQL statements.</p>
+        <table class="tt"><thead><tr><th>Command</th><th>Action</th><th>Example</th></tr></thead><tbody>
+          <tr><td><code>SELECT</code></td><td>Read data</td><td><code>SELECT * FROM users WHERE age > 18</code></td></tr>
+          <tr><td><code>INSERT</code></td><td>Add data</td><td><code>INSERT INTO posts (title) VALUES ('Hello')</code></td></tr>
+          <tr><td><code>UPDATE</code></td><td>Modify</td><td><code>UPDATE users SET name = 'Din' WHERE id = 1</code></td></tr>
+          <tr><td><code>DELETE</code></td><td>Remove</td><td><code>DELETE FROM sessions WHERE expired = true</code></td></tr>
+          <tr><td><code>JOIN</code></td><td>Combine tables</td><td><code>SELECT * FROM orders JOIN users ON user_id = users.id</code></td></tr>
+        </tbody></table>
+        <div class="callout green"><div class="cl">Why developers love it</div><p>SQL is declarative — you say what you want, not how to get it. Learn SQL once and use it on PostgreSQL, MySQL, SQLite, and more. It's been battle-tested for 50 years.</p></div>
+        <div class="ch-nav"><button class="nb" onclick="go('serverless',null)">← Serverless</button><button class="nb" onclick="go('postgresql',null)">PostgreSQL →</button></div>
+      </div>
+    </div>
+
+    <!-- POSTGRESQL -->
+    <div id="pg-postgresql" class="page">
+      <div class="ch-page">
+        <div class="ch-hdr"><div class="ch-ey">Part 4 · Databases</div><div class="ch-title">PostgreSQL</div><p class="ch-desc">The world's most advanced open-source relational database. The default for serious applications.</p></div>
+        <h2>What is it?</h2>
+        <p>PostgreSQL (Postgres) is an open-source <strong>relational database</strong> with 35+ years of development. Known for reliability, correctness, and features that go far beyond standard SQL.</p>
+        <div class="cg">
+          <div class="card"><div class="card-t">JSON support</div><div class="card-d">Store and query JSON natively. Best of relational and document worlds.</div></div>
+          <div class="card"><div class="card-t">Extensions</div><div class="card-d">pgvector for AI. PostGIS for geo. TimescaleDB for time-series.</div></div>
+          <div class="card"><div class="card-t">ACID compliant</div><div class="card-d">Transactions are safe. Data is never corrupted. Banks use Postgres.</div></div>
+          <div class="card"><div class="card-t">Open source</div><div class="card-d">No licensing cost. Backed by a huge community. Runs everywhere.</div></div>
+        </div>
+        <div class="callout green"><div class="cl">Real example</div><p>Instagram, Reddit, Twitch, Discord, and GitHub all use PostgreSQL. Supabase is "Firebase but Postgres." Neon, PlanetScale, Railway, and Render all offer managed Postgres. The overwhelmingly dominant choice for startups in 2025.</p></div>
+        <div class="callout"><div class="cl">The Prisma connection</div><p>Most modern apps use Prisma as an ORM on top of Postgres. Define your schema in a <code>.prisma</code> file. Prisma generates type-safe queries in TypeScript. No raw SQL needed for most operations.</p></div>
+        <div class="ch-nav"><button class="nb" onclick="go('sql',null)">← SQL</button><button class="nb" onclick="go('mongodb',null)">MongoDB →</button></div>
+      </div>
+    </div>
+
+    <!-- MONGODB -->
+    <div id="pg-mongodb" class="page">
+      <div class="ch-page">
+        <div class="ch-hdr"><div class="ch-ey">Part 4 · Databases</div><div class="ch-title">MongoDB</div><p class="ch-desc">A document database. No tables, no rigid schemas — store JSON objects directly.</p></div>
+        <h2>What is it?</h2>
+        <p>MongoDB is a <strong>NoSQL document database</strong>. Instead of rows in tables, you store documents — JSON-like objects. A user document might have a name, email, an array of addresses, and nested preferences — all in one document, no joins required.</p>
+        <table class="tt"><thead><tr><th>Situation</th><th>Choose</th></tr></thead><tbody>
+          <tr><td>Structured data with relationships</td><td><span class="bgreen">PostgreSQL</span></td></tr>
+          <tr><td>Flexible schema that changes often</td><td><span class="bamb">MongoDB</span></td></tr>
+          <tr><td>E-commerce, banking, SaaS</td><td><span class="bgreen">PostgreSQL</span></td></tr>
+          <tr><td>Content management, catalogs</td><td><span class="bamb">MongoDB</span></td></tr>
+          <tr><td>Need ACID transactions</td><td><span class="bgreen">PostgreSQL</span></td></tr>
+        </tbody></table>
+        <div class="callout amber"><div class="cl">Honest take</div><p>MongoDB was extremely popular in the 2010s (MEAN stack). Today Postgres with JSON support and Prisma handles most MongoDB use cases — with the added benefit of transactions and relational integrity. Default to Postgres for new projects.</p></div>
+        <div class="ch-nav"><button class="nb" onclick="go('postgresql',null)">← PostgreSQL</button><button class="nb" onclick="go('redis',null)">Redis →</button></div>
+      </div>
+    </div>
+
+    <!-- REDIS -->
+    <div id="pg-redis" class="page">
+      <div class="ch-page">
+        <div class="ch-hdr"><div class="ch-ey">Part 4 · Databases</div><div class="ch-title">Redis</div><p class="ch-desc">The fastest data store on Earth. In-memory, blazing fast, used for caching, sessions, and real-time features.</p></div>
+        <h2>What is it?</h2>
+        <p>Redis is an <strong>in-memory data store</strong>. All data lives in RAM, so reads and writes happen in microseconds. Used for caching expensive queries, storing user sessions, rate limiting, and pub/sub messaging.</p>
+        <div class="tl">
+          <div class="tli"><div class="tld">→</div><div><div class="tlt">User requests dashboard data</div><div class="tlb">Check Redis first: is this data in cache?</div></div></div>
+          <div class="tli"><div class="tld">✓</div><div><div class="tlt">Cache hit → return in under 1ms</div><div class="tlb">User gets data instantly. No database query needed.</div></div></div>
+          <div class="tli"><div class="tld">✗</div><div><div class="tlt">Cache miss → query Postgres</div><div class="tlb">Get data from database, store in Redis for next time.</div></div></div>
+        </div>
+        <div class="cg">
+          <div class="card"><div class="card-t">Caching</div><div class="card-d">Cache expensive DB queries. Reduce load. Speed up responses dramatically.</div></div>
+          <div class="card"><div class="card-t">Sessions</div><div class="card-d">Store user sessions. Fast auth checks on every request.</div></div>
+          <div class="card"><div class="card-t">Rate limiting</div><div class="card-d">Limit API calls per user per minute. Prevent abuse.</div></div>
+          <div class="card"><div class="card-t">Pub/Sub</div><div class="card-d">Real-time messaging between services.</div></div>
+        </div>
+        <div class="ch-nav"><button class="nb" onclick="go('mongodb',null)">← MongoDB</button><button class="nb" onclick="go('dns',null)">DNS & Domains →</button></div>
+      </div>
+    </div>
+
+    <!-- DNS -->
+    <div id="pg-dns" class="page">
+      <div class="ch-page">
+        <div class="ch-hdr"><div class="ch-ey">Part 5 · Cloud & Infrastructure</div><div class="ch-title">DNS & Domains</div><p class="ch-desc">The internet's address book. DNS translates human-readable names into machine addresses.</p></div>
+        <h2>What is DNS?</h2>
+        <p>DNS (Domain Name System) maps domain names (<code>google.com</code>) to IP addresses (<code>142.250.80.46</code>). Computers communicate via IPs. Humans use domain names. DNS bridges the gap — in milliseconds, globally, billions of times per second.</p>
+        <h2>DNS record types every developer needs</h2>
+        <table class="tt"><thead><tr><th>Record</th><th>Purpose</th><th>Example</th></tr></thead><tbody>
+          <tr><td><code>A</code></td><td>Maps domain to IPv4</td><td><code>myapp.com → 104.21.33.92</code></td></tr>
+          <tr><td><code>CNAME</code></td><td>Alias to another domain</td><td><code>www → myapp.com</code></td></tr>
+          <tr><td><code>MX</code></td><td>Mail server routing</td><td>Google Workspace email setup</td></tr>
+          <tr><td><code>TXT</code></td><td>Verification, SPF, DKIM</td><td>Prove domain ownership</td></tr>
+        </tbody></table>
+        <div class="callout green"><div class="cl">Practical tip</div><p>When you deploy to Vercel and add a custom domain, you're adding a CNAME record in your domain registrar (Namecheap, Cloudflare) pointing to Vercel's DNS. That's DNS in practice — you'll do it on every project.</p></div>
+        <div class="ch-nav"><button class="nb" onclick="go('redis',null)">← Redis</button><button class="nb" onclick="go('vercel',null)">Vercel & Hosting →</button></div>
+      </div>
+    </div>
+
+    <!-- VERCEL -->
+    <div id="pg-vercel" class="page">
+      <div class="ch-page">
+        <div class="ch-hdr"><div class="ch-ey">Part 5 · Cloud & Infrastructure</div><div class="ch-title">Vercel & Modern Hosting</div><p class="ch-desc">Deploy a production application in 30 seconds. Modern hosting abstracts away what used to require a DevOps team.</p></div>
+        <h2>What is Vercel?</h2>
+        <p>Vercel is a <strong>cloud platform optimized for frontend and full-stack JavaScript</strong>, built by the creators of Next.js. Connect a GitHub repo, and every push auto-deploys. Every PR gets a preview URL. Serverless functions are automatic. Global CDN included.</p>
+        <table class="tt"><thead><tr><th>Platform</th><th>Best for</th><th>Complexity</th></tr></thead><tbody>
+          <tr><td>Vercel</td><td>Next.js, React, full-stack JS</td><td><span class="bgreen">Low</span></td></tr>
+          <tr><td>Netlify</td><td>Static sites, JAMstack</td><td><span class="bgreen">Low</span></td></tr>
+          <tr><td>Railway</td><td>Node.js, databases, microservices</td><td><span class="bamb">Medium</span></td></tr>
+          <tr><td>Render</td><td>Full apps with databases and Redis</td><td><span class="bamb">Medium</span></td></tr>
+          <tr><td>AWS / GCP / Azure</td><td>Enterprise scale, full control</td><td><span class="bred">High</span></td></tr>
+          <tr><td>Cloudflare Pages</td><td>Edge-first, global performance</td><td><span class="bgreen">Low</span></td></tr>
+        </tbody></table>
+        <div class="callout"><div class="cl">Recommended starting stack</div><p>For any Next.js project: Vercel for the app, Supabase (managed Postgres) for the database, Upstash (managed Redis) for caching. Idea to production in hours, not weeks.</p></div>
+        <div class="ch-nav"><button class="nb" onclick="go('dns',null)">← DNS & Domains</button><button class="nb" onclick="go('aws',null)">AWS →</button></div>
+      </div>
+    </div>
+
+    <!-- AWS -->
+    <div id="pg-aws" class="page">
+      <div class="ch-page">
+        <div class="ch-hdr"><div class="ch-ey">Part 5 · Cloud & Infrastructure</div><div class="ch-title">AWS</div><p class="ch-desc">The cloud infrastructure powering a third of the internet. Essential to understand, careful when to start with.</p></div>
+        <h2>What is it?</h2>
+        <p>AWS (Amazon Web Services) is the world's largest <strong>cloud computing platform</strong> with 200+ services. Netflix runs almost entirely on AWS. Airbnb, Slack, Reddit, and NASA all use AWS.</p>
+        <div class="cg">
+          <div class="card"><div class="card-t">EC2</div><div class="card-d">Virtual servers. The basic compute unit of AWS.</div></div>
+          <div class="card"><div class="card-t">RDS</div><div class="card-d">Managed PostgreSQL, MySQL. No server management.</div></div>
+          <div class="card"><div class="card-t">S3</div><div class="card-d">Object storage. Images, files, backups — unlimited scale.</div></div>
+          <div class="card"><div class="card-t">Lambda</div><div class="card-d">Serverless functions. Run code without managing servers.</div></div>
+          <div class="card"><div class="card-t">CloudFront</div><div class="card-d">AWS's CDN. Serve content fast globally.</div></div>
+          <div class="card"><div class="card-t">IAM</div><div class="card-d">Control who can do what on your AWS account.</div></div>
+        </div>
+        <div class="callout amber"><div class="cl">Honest advice</div><p>Don't start with AWS for side projects. Start with Vercel + Supabase. Learn AWS when you join a company that uses it, or when you need enterprise-scale control. AWS is powerful but complex — and expensive if misconfigured.</p></div>
+        <div class="ch-nav"><button class="nb" onclick="go('vercel',null)">← Vercel & Hosting</button><button class="nb" onclick="go('docker',null)">Docker →</button></div>
+      </div>
+    </div>
+
+    <!-- DOCKER -->
+    <div id="pg-docker" class="page">
+      <div class="ch-page">
+        <div class="ch-hdr"><div class="ch-ey">Part 5 · Cloud & Infrastructure</div><div class="ch-title">Docker</div><p class="ch-desc">"It works on my machine." Docker solves this by packaging your app and its entire environment together.</p></div>
+        <h2>What is it?</h2>
+        <p>Docker is a platform for <strong>packaging applications into containers</strong>. A container includes your code, runtime, dependencies, and configuration. It runs identically on your laptop, a colleague's computer, a CI server, and a cloud VM.</p>
+        <div class="cg">
+          <div class="card"><div class="card-t">Dockerfile</div><div class="card-d">A recipe describing how to build your container image.</div></div>
+          <div class="card"><div class="card-t">Image</div><div class="card-d">The built, read-only template from a Dockerfile.</div></div>
+          <div class="card"><div class="card-t">Container</div><div class="card-d">A running instance of an image. Lightweight, isolated, disposable.</div></div>
+          <div class="card"><div class="card-t">Compose</div><div class="card-d">Run App + Postgres + Redis together with one command.</div></div>
+        </div>
+        <div class="callout green"><div class="cl">Real example</div><p>New developer joining. Without Docker: 3 hours installing and configuring dependencies. With Docker: <code>docker-compose up</code> and everything runs in 3 minutes. Same versions. Same behavior. Every time.</p></div>
+        <div class="ch-nav"><button class="nb" onclick="go('aws',null)">← AWS</button><button class="nb" onclick="go('cicd',null)">CI/CD →</button></div>
+      </div>
+    </div>
+
+    <!-- CI/CD -->
+    <div id="pg-cicd" class="page">
+      <div class="ch-page">
+        <div class="ch-hdr"><div class="ch-ey">Part 5 · Cloud & Infrastructure</div><div class="ch-title">CI/CD</div><p class="ch-desc">Automate the path from code to production. Never manually deploy again.</p></div>
+        <h2>What is it?</h2>
+        <p><strong>Continuous Integration (CI)</strong> automatically runs tests and builds every time code is pushed. <strong>Continuous Deployment (CD)</strong> automatically ships code to production when CI passes. Together they remove the human bottleneck from shipping software.</p>
+        <div class="tl">
+          <div class="tli"><div class="tld">1</div><div><div class="tlt">Developer pushes to GitHub</div><div class="tlb">A commit or pull request triggers the pipeline.</div></div></div>
+          <div class="tli"><div class="tld">2</div><div><div class="tlt">CI runs automatically</div><div class="tlb">Tests run, TypeScript checked, lint errors flagged, Docker image built.</div></div></div>
+          <div class="tli"><div class="tld">3</div><div><div class="tlt">All checks pass → CD deploys</div><div class="tlb">Code automatically deployed to staging or production.</div></div></div>
+          <div class="tli"><div class="tld">4</div><div><div class="tlt">Checks fail → developer notified</div><div class="tlb">Broken code never reaches production. The pipeline is the safety net.</div></div></div>
+        </div>
+        <div class="callout green"><div class="cl">Real example</div><p>Vercel is CI/CD for Next.js. Push to <code>main</code> → Vercel builds and deploys automatically. That's a complete CI/CD pipeline. It's free for most projects.</p></div>
+        <div class="ch-nav"><button class="nb" onclick="go('docker',null)">← Docker</button><button class="nb" onclick="go('websockets',null)">WebSockets →</button></div>
+      </div>
+    </div>
+
+    <!-- WEBSOCKETS -->
+    <div id="pg-websockets" class="page">
+      <div class="ch-page">
+        <div class="ch-hdr"><div class="ch-ey">Part 6 · Real-Time</div><div class="ch-title">WebSockets</div><p class="ch-desc">HTTP asks and waits. WebSockets open a persistent channel for real-time, bidirectional communication.</p></div>
+        <h2>The problem with HTTP for real-time</h2>
+        <p>With regular HTTP, your browser asks "any new messages?" → server responds → connection closes. For chat or live dashboards you'd ask hundreds of times per second. WebSockets solve this by keeping the connection <strong>permanently open</strong>.</p>
+        <div class="cg">
+          <div class="card"><div class="card-t">HTTP Polling</div><div class="card-d">Ask every second for new data. Wasteful. Slow. Doesn't scale.</div></div>
+          <div class="card"><div class="card-t">WebSockets</div><div class="card-d">Open once. Server pushes data as it arrives. Instant. Efficient.</div></div>
+        </div>
+        <div class="pills"><div class="pill">Chat apps (Slack, Discord)</div><div class="pill">Live dashboards</div><div class="pill">Multiplayer games</div><div class="pill">Stock price updates</div><div class="pill">Collaborative editing (Figma, Notion)</div><div class="pill">AI streaming responses</div></div>
+        <div class="callout"><div class="cl">AI streaming connection</div><p>When ChatGPT streams its response word by word — that's a WebSocket (or Server-Sent Events) connection keeping the channel open while tokens arrive. Every AI chat interface works this way.</p></div>
+        <div class="ch-nav"><button class="nb" onclick="go('cicd',null)">← CI/CD</button><button class="nb" onclick="go('kafka',null)">Kafka →</button></div>
+      </div>
+    </div>
+
+    <!-- KAFKA -->
+    <div id="pg-kafka" class="page">
+      <div class="ch-page">
+        <div class="ch-hdr"><div class="ch-ey">Part 6 · Real-Time</div><div class="ch-title">Kafka</div><p class="ch-desc">A distributed event streaming platform. The backbone of data pipelines at companies processing millions of events per second.</p></div>
+        <h2>What is it?</h2>
+        <p>Apache Kafka is a <strong>distributed event streaming platform</strong>. Services publish events ("order placed," "user signed up") to Kafka topics. Other services subscribe to those topics and react. This decouples your architecture completely.</p>
+        <div class="eco-svg" style="padding:16px 20px">
+          <svg width="100%" viewBox="0 0 560 140" role="img"><title>Kafka pub/sub pattern</title><desc>Producers publish to Kafka topics, consumers subscribe</desc>
+            <defs><marker id="ar2" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+            <rect x="10" y="42" width="110" height="34" rx="7" fill="rgba(93,216,181,.12)" stroke="rgba(93,216,181,.4)" stroke-width="1"/>
+            <text x="65" y="64" text-anchor="middle" font-size="12" font-weight="600" fill="#5dd8b5">Order Service</text>
+            <rect x="10" y="86" width="110" height="34" rx="7" fill="rgba(93,216,181,.12)" stroke="rgba(93,216,181,.4)" stroke-width="1"/>
+            <text x="65" y="108" text-anchor="middle" font-size="12" font-weight="600" fill="#5dd8b5">Auth Service</text>
+            <line x1="120" y1="59" x2="198" y2="78" stroke="rgba(93,216,181,.5)" stroke-width="1" marker-end="url(#ar2)"/>
+            <line x1="120" y1="103" x2="198" y2="84" stroke="rgba(93,216,181,.5)" stroke-width="1" marker-end="url(#ar2)"/>
+            <rect x="200" y="60" width="120" height="44" rx="8" fill="rgba(124,111,247,.15)" stroke="rgba(124,111,247,.5)" stroke-width="1.5"/>
+            <text x="260" y="79" text-anchor="middle" font-size="12" font-weight="700" fill="#a89ff7">Kafka</text>
+            <text x="260" y="96" text-anchor="middle" font-size="11" fill="rgba(232,230,240,.6)">Event Topics</text>
+            <line x1="320" y1="74" x2="398" y2="59" stroke="rgba(240,112,96,.5)" stroke-width="1" marker-end="url(#ar2)"/>
+            <line x1="320" y1="86" x2="398" y2="103" stroke="rgba(74,158,255,.5)" stroke-width="1" marker-end="url(#ar2)"/>
+            <rect x="400" y="42" width="120" height="34" rx="7" fill="rgba(240,112,96,.12)" stroke="rgba(240,112,96,.4)" stroke-width="1"/>
+            <text x="460" y="64" text-anchor="middle" font-size="12" font-weight="600" fill="#f07060">Email Service</text>
+            <rect x="400" y="86" width="120" height="34" rx="7" fill="rgba(74,158,255,.12)" stroke="rgba(74,158,255,.4)" stroke-width="1"/>
+            <text x="460" y="108" text-anchor="middle" font-size="12" font-weight="600" fill="#4a9eff">Analytics</text>
+            <text x="135" y="130" text-anchor="middle" font-size="11" fill="rgba(232,230,240,.4)">Producers</text>
+            <text x="425" y="130" text-anchor="middle" font-size="11" fill="rgba(232,230,240,.4)">Consumers</text>
+          </svg>
+        </div>
+        <div class="callout amber"><div class="cl">When you actually need it</div><p>Not for your first startup. Use it when you have multiple services reacting to the same events, or when you need high-throughput event streaming. For small apps, BullMQ (Redis-based) is usually enough.</p></div>
+        <div class="ch-nav"><button class="nb" onclick="go('websockets',null)">← WebSockets</button><button class="nb" onclick="go('llms',null)">LLMs →</button></div>
+      </div>
+    </div>
+
+    <!-- LLMS -->
+    <div id="pg-llms" class="page">
+      <div class="ch-page">
+        <div class="ch-hdr"><div class="ch-ey">Part 7 · Artificial Intelligence</div><div class="ch-title">Large Language Models</div><p class="ch-desc">The technology behind ChatGPT, Claude, and Gemini. Understanding LLMs changes how you build software.</p></div>
+        <h2>What is an LLM?</h2>
+        <p>A Large Language Model is a <strong>neural network trained on vast amounts of text</strong> to predict the next token in a sequence. Through this training, models develop the ability to write code, answer questions, reason through problems, and generate human-like text.</p>
+        <h2>The intuition</h2>
+        <p>An LLM doesn't "know" things like a database does. It has learned <strong>statistical patterns</strong> in language. When you ask "What is the capital of France?" it predicts "Paris" is the most likely next token — because that pattern appeared billions of times in training data.</p>
+        <table class="tt"><thead><tr><th>Concept</th><th>What it means</th></tr></thead><tbody>
+          <tr><td>Context window</td><td>How much text the model sees at once. GPT-4 = 128k tokens.</td></tr>
+          <tr><td>Temperature</td><td>Randomness. 0 = deterministic. 1+ = creative/unpredictable.</td></tr>
+          <tr><td>System prompt</td><td>Instructions given before the user message. Sets behavior.</td></tr>
+          <tr><td>Tokens</td><td>The unit LLMs process. ~4 characters per token. You pay per token.</td></tr>
+          <tr><td>Fine-tuning</td><td>Training an existing model further on your specific data.</td></tr>
+        </tbody></table>
+        <div class="ch-nav"><button class="nb" onclick="go('kafka',null)">← Kafka</button><button class="nb" onclick="go('aiapis',null)">OpenAI · Claude · Gemini →</button></div>
+      </div>
+    </div>
+
+    <!-- AI APIS -->
+    <div id="pg-aiapis" class="page">
+      <div class="ch-page">
+        <div class="ch-hdr"><div class="ch-ey">Part 7 · Artificial Intelligence</div><div class="ch-title">OpenAI · Claude · Gemini</div><p class="ch-desc">The three major AI API providers. Understanding their differences helps you pick the right model.</p></div>
+        <table class="tt"><thead><tr><th>Provider</th><th>Models</th><th>Strengths</th></tr></thead><tbody>
+          <tr><td><strong>OpenAI</strong></td><td>GPT-4o, GPT-4.1, o3</td><td>Widest ecosystem, function calling, most integrations</td></tr>
+          <tr><td><strong>Anthropic</strong></td><td>Claude Sonnet 4.6, Opus 4</td><td>Long context, safety, coding, instruction following</td></tr>
+          <tr><td><strong>Google</strong></td><td>Gemini 2.0, Ultra</td><td>Massive context, multimodal, Google ecosystem</td></tr>
+          <tr><td><strong>Meta</strong></td><td>Llama 3.1, 3.3</td><td>Open weights, self-hosted, no per-token cost at scale</td></tr>
+        </tbody></table>
+        <h2>How to call an AI API</h2>
+        <div class="eco-svg" style="padding:14px 18px">
+          <div style="font-family:monospace;font-size:12px;color:#5dd8b5;line-height:1.8">
+            const response = await fetch('/v1/messages', {<br>
+            &nbsp;&nbsp;method: 'POST',<br>
+            &nbsp;&nbsp;body: JSON.stringify({<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;model: 'claude-sonnet-4-6',<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;messages: [{ role: 'user', content: prompt }]<br>
+            &nbsp;&nbsp;})<br>
+            })
+          </div>
+        </div>
+        <div class="callout"><div class="cl">Which to use?</div><p>Start with Claude Sonnet 4.6 or GPT-4o — both excellent, well-priced, with great SDKs. Use Gemini when you need million-token context windows or tight Google Workspace integration.</p></div>
+        <div class="ch-nav"><button class="nb" onclick="go('llms',null)">← LLMs</button><button class="nb" onclick="go('rag',null)">RAG & Embeddings →</button></div>
+      </div>
+    </div>
+
+    <!-- RAG -->
+    <div id="pg-rag" class="page">
+      <div class="ch-page">
+        <div class="ch-hdr"><div class="ch-ey">Part 7 · Artificial Intelligence</div><div class="ch-title">RAG & Embeddings</div><p class="ch-desc">How to give an AI model knowledge about YOUR data. The technique behind most production AI applications.</p></div>
+        <h2>The problem</h2>
+        <p>Claude and ChatGPT don't know your company's documentation, your codebase, or last week's news. RAG (Retrieval-Augmented Generation) solves this by finding relevant information and feeding it into the model's context at query time.</p>
+        <h2>What are embeddings?</h2>
+        <p>An <strong>embedding</strong> converts text into a list of numbers (a vector) capturing the meaning of that text. Texts with similar meaning have vectors that are mathematically close. This enables semantic search — search by meaning, not just keywords.</p>
+        <div class="tl">
+          <div class="tli"><div class="tld">1</div><div><div class="tlt">Ingest your documents</div><div class="tlb">Chunk your docs. Convert each chunk to an embedding vector. Store in a vector database.</div></div></div>
+          <div class="tli"><div class="tld">2</div><div><div class="tlt">User asks a question</div><div class="tlb">Convert the question to a vector using the same model.</div></div></div>
+          <div class="tli"><div class="tld">3</div><div><div class="tlt">Find similar chunks</div><div class="tlb">Search the vector DB for chunks whose vectors are closest to the question.</div></div></div>
+          <div class="tli"><div class="tld">4</div><div><div class="tlt">Augment the prompt</div><div class="tlb">"Answer this using these documents: [chunks]" — model answers with your actual data.</div></div></div>
+        </div>
+        <div class="pills"><div class="pill">Pinecone — managed, production-ready</div><div class="pill">pgvector — Postgres extension</div><div class="pill">Weaviate — open-source</div><div class="pill">Chroma — local development</div></div>
+        <div class="ch-nav"><button class="nb" onclick="go('aiapis',null)">← AI APIs</button><button class="nb" onclick="go('agents',null)">AI Agents & MCP →</button></div>
+      </div>
+    </div>
+
+    <!-- AGENTS -->
+    <div id="pg-agents" class="page">
+      <div class="ch-page">
+        <div class="ch-hdr"><div class="ch-ey">Part 7 · Artificial Intelligence</div><div class="ch-title">AI Agents & MCP</div><p class="ch-desc">AI that takes action. Not just answering questions — autonomously using tools, writing code, and completing tasks.</p></div>
+        <h2>What is an AI agent?</h2>
+        <p>An AI agent is an LLM with the ability to <strong>use tools</strong> — search the web, run code, call APIs, read files, take actions. Instead of "how do I fix this bug?" an agent can fix the bug, run the tests, and commit the fix.</p>
+        <div class="tl">
+          <div class="tli"><div class="tld">1</div><div><div class="tlt">Receive a goal</div><div class="tlb">"Research the top 5 competitors and write a summary."</div></div></div>
+          <div class="tli"><div class="tld">2</div><div><div class="tlt">Plan steps</div><div class="tlb">The LLM reasons which tools to use and in what order.</div></div></div>
+          <div class="tli"><div class="tld">3</div><div><div class="tlt">Execute with tools</div><div class="tlb">Calls web search, reads pages, extracts data, repeats as needed.</div></div></div>
+          <div class="tli"><div class="tld">4</div><div><div class="tlt">Evaluate and return</div><div class="tlb">Checks if goal is achieved. Returns completed output.</div></div></div>
+        </div>
+        <h2>MCP — Model Context Protocol</h2>
+        <p>MCP is an open standard created by Anthropic that defines a <strong>universal protocol for connecting AI models to tools and data sources</strong>. An MCP server exposes tools; any MCP-compatible AI can use them. It's the USB standard of AI tooling.</p>
+        <div class="callout green"><div class="cl">Real example</div><p>Claude Code is an AI coding agent using MCP to connect to your filesystem, terminal, and browser. It reads your codebase, runs tests, fixes bugs, and deploys — all from a conversation. This is where all software development tooling is heading.</p></div>
+        <div class="ch-nav"><button class="nb" onclick="go('rag',null)">← RAG & Embeddings</button><button class="nb" onclick="go('payments',null)">Payments →</button></div>
+      </div>
+    </div>
+
+    <!-- PAYMENTS -->
+    <div id="pg-payments" class="page">
+      <div class="ch-page">
+        <div class="ch-hdr"><div class="ch-ey">Part 8 · Product Features</div><div class="ch-title">Payments</div><p class="ch-desc">Taking money on the internet. Stripe made it a weekend project instead of a months-long compliance nightmare.</p></div>
+        <table class="tt"><thead><tr><th>Provider</th><th>Best for</th><th>Notable</th></tr></thead><tbody>
+          <tr><td><strong>Stripe</strong></td><td>Startups, SaaS, subscriptions</td><td>Best DX, global, 135+ currencies</td></tr>
+          <tr><td><strong>Paddle</strong></td><td>SaaS, B2B software</td><td>Merchant of record — handles VAT/taxes</td></tr>
+          <tr><td><strong>Lemon Squeezy</strong></td><td>Indie developers, digital products</td><td>Simple, developer-friendly</td></tr>
+          <tr><td><strong>PayPal</strong></td><td>Consumer-facing, marketplaces</td><td>High brand recognition</td></tr>
+        </tbody></table>
+        <h2>How Stripe works</h2>
+        <div class="tl">
+          <div class="tli"><div class="tld">1</div><div><div class="tlt">Stripe.js collects card details</div><div class="tlb">Card data goes directly to Stripe. Your server never sees the card number.</div></div></div>
+          <div class="tli"><div class="tld">2</div><div><div class="tlt">Stripe returns a payment intent</div><div class="tlb">A token representing the payment. Your server confirms it.</div></div></div>
+          <div class="tli"><div class="tld">3</div><div><div class="tlt">Stripe charges the card</div><div class="tlb">Handles fraud detection, 3D Secure, banking protocols.</div></div></div>
+          <div class="tli"><div class="tld">4</div><div><div class="tlt">Webhook confirms success</div><div class="tlb">Stripe calls your endpoint. You fulfill the order.</div></div></div>
+        </div>
+        <div class="callout green"><div class="cl">Developer tip</div><p>Use Stripe's Checkout for your first implementation — it handles UI, compliance, and internationalization. Only build custom payment flows when you outgrow the defaults.</p></div>
+        <div class="ch-nav"><button class="nb" onclick="go('agents',null)">← AI Agents</button><button class="nb" onclick="go('analytics',null)">Analytics →</button></div>
+      </div>
+    </div>
+
+    <!-- ANALYTICS -->
+    <div id="pg-analytics" class="page">
+      <div class="ch-page">
+        <div class="ch-hdr"><div class="ch-ey">Part 8 · Product Features</div><div class="ch-title">Analytics</div><p class="ch-desc">Build things. Measure them. Improve them. Analytics closes the loop between what you build and what actually works.</p></div>
+        <div class="cg">
+          <div class="card"><div class="card-t">Product analytics</div><div class="card-d">How users interact with your app. PostHog, Mixpanel, Amplitude.</div></div>
+          <div class="card"><div class="card-t">Web analytics</div><div class="card-d">Traffic, pages, sources. Plausible, Vercel Analytics.</div></div>
+          <div class="card"><div class="card-t">Error tracking</div><div class="card-d">Catch crashes before users report them. Sentry, LogRocket.</div></div>
+          <div class="card"><div class="card-t">Performance</div><div class="card-d">Core Web Vitals, load times. Lighthouse, Vercel Speed Insights.</div></div>
+        </div>
+        <div class="callout green"><div class="cl">Recommended starting stack</div><p>PostHog covers product analytics, feature flags, session recordings, and A/B tests in one open-source tool. Plausible for privacy-friendly web traffic. Sentry for error tracking. That's your analytics foundation.</p></div>
+        <div class="ch-nav"><button class="nb" onclick="go('payments',null)">← Payments</button><button class="nb" onclick="go('mobile',null)">React Native & Flutter →</button></div>
+      </div>
+    </div>
+
+    <!-- MOBILE -->
+    <div id="pg-mobile" class="page">
+      <div class="ch-page">
+        <div class="ch-hdr"><div class="ch-ey">Part 9 · Mobile & Desktop</div><div class="ch-title">React Native & Flutter</div><p class="ch-desc">Build native mobile apps without learning two separate languages.</p></div>
+        <table class="tt"><thead><tr><th></th><th>React Native</th><th>Flutter</th></tr></thead><tbody>
+          <tr><td>Language</td><td>JavaScript / TypeScript</td><td>Dart</td></tr>
+          <tr><td>Created by</td><td>Meta</td><td>Google</td></tr>
+          <tr><td>Rendering</td><td>Native platform components</td><td>Own rendering engine</td></tr>
+          <tr><td>Web skills transfer</td><td>React skills transfer directly</td><td>Separate learning path</td></tr>
+          <tr><td>Best for</td><td>Web devs adding mobile</td><td>Pixel-perfect custom UI</td></tr>
+          <tr><td>Notable apps</td><td>Facebook, Instagram, Shopify</td><td>Google Pay, BMW</td></tr>
+        </tbody></table>
+        <div class="cg">
+          <div class="card"><div class="card-t">Native (Swift/Kotlin)</div><div class="card-d">Max performance, complex hardware access. Large dedicated teams.</div></div>
+          <div class="card"><div class="card-t">React Native</div><div class="card-d">Web dev team adding mobile. Shared codebase. Fast iteration.</div></div>
+          <div class="card"><div class="card-t">Flutter</div><div class="card-d">Custom UI identical on all platforms. Strong design requirements.</div></div>
+          <div class="card"><div class="card-t">PWA</div><div class="card-d">Installable without an app store. Great for simple use cases.</div></div>
+        </div>
+        <div class="ch-nav"><button class="nb" onclick="go('analytics',null)">← Analytics</button><button class="nb" onclick="go('security',null)">Security →</button></div>
+      </div>
+    </div>
+
+    <!-- SECURITY -->
+    <div id="pg-security" class="page">
+      <div class="ch-page">
+        <div class="ch-hdr"><div class="ch-ey">Part 10 · Security</div><div class="ch-title">Security Fundamentals</div><p class="ch-desc">Security is not a feature — it is a quality of everything you build.</p></div>
+        <div class="cg">
+          <div class="card"><div class="card-t">HTTPS everywhere</div><div class="card-d">All traffic encrypted with TLS. Vercel and Cloudflare handle this free.</div></div>
+          <div class="card"><div class="card-t">Hash passwords</div><div class="card-d">Never store plaintext. Use bcrypt. Never know your users' passwords.</div></div>
+          <div class="card"><div class="card-t">SQL injection</div><div class="card-d">Always use parameterized queries or an ORM. Never concatenate user input into SQL.</div></div>
+          <div class="card"><div class="card-t">XSS prevention</div><div class="card-d">Sanitize all HTML output. React does this automatically.</div></div>
+          <div class="card"><div class="card-t">CORS config</div><div class="card-d">Only allow requests from your actual domains. No wildcard * in production.</div></div>
+          <div class="card"><div class="card-t">Rate limiting</div><div class="card-d">Limit requests per IP per minute. Prevent brute force. Use Redis.</div></div>
+        </div>
+        <div class="callout red"><div class="cl">The most common breach</div><p>Most breaches aren't sophisticated — they're exposed environment variables on GitHub, SQL injection from unvalidated input, or weak admin passwords. The basics prevent 90% of attacks.</p></div>
+        <div class="ch-nav"><button class="nb" onclick="go('mobile',null)">← Mobile</button><button class="nb" onclick="go('ecom',null)">E-Commerce Architecture →</button></div>
+      </div>
+    </div>
+
+    <!-- E-COMMERCE ARCH -->
+    <div id="pg-ecom" class="page">
+      <div class="ch-page">
+        <div class="ch-hdr"><div class="ch-ey">Part 11 · System Design</div><div class="ch-title">E-Commerce Architecture</div><p class="ch-desc">How all the technologies you've learned connect to power a real online store.</p></div>
+        <div class="eco-svg">
+          <svg width="100%" viewBox="0 0 620 410" role="img"><title>E-commerce platform architecture</title><desc>Full architecture showing frontend, backend services, databases, and infrastructure</desc>
+            <defs><marker id="ar3" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+            <rect x="220" y="12" width="180" height="34" rx="8" fill="rgba(93,216,181,.15)" stroke="rgba(93,216,181,.4)" stroke-width="1"/>
+            <text x="310" y="34" text-anchor="middle" font-size="12" font-weight="600" fill="#5dd8b5">Customer Browser</text>
+            <rect x="140" y="70" width="100" height="32" rx="6" fill="rgba(74,158,255,.1)" stroke="rgba(74,158,255,.3)" stroke-width="1"/>
+            <text x="190" y="84" text-anchor="middle" font-size="11" fill="#4a9eff">Cloudflare CDN</text>
+            <text x="190" y="97" text-anchor="middle" font-size="10" fill="rgba(232,230,240,.45)">Edge cache</text>
+            <rect x="280" y="70" width="130" height="32" rx="6" fill="rgba(93,216,181,.1)" stroke="rgba(93,216,181,.3)" stroke-width="1"/>
+            <text x="345" y="84" text-anchor="middle" font-size="11" fill="#5dd8b5">Next.js + Vercel</text>
+            <text x="345" y="97" text-anchor="middle" font-size="10" fill="rgba(232,230,240,.45)">React, Tailwind</text>
+            <rect x="200" y="132" width="220" height="32" rx="6" fill="rgba(124,111,247,.1)" stroke="rgba(124,111,247,.3)" stroke-width="1"/>
+            <text x="310" y="146" text-anchor="middle" font-size="11" fill="#a89ff7">API Gateway / Load Balancer</text>
+            <text x="310" y="159" text-anchor="middle" font-size="10" fill="rgba(232,230,240,.45)">Auth middleware, rate limiting</text>
+            <rect x="14" y="210" width="108" height="42" rx="6" fill="rgba(124,111,247,.08)" stroke="rgba(124,111,247,.25)" stroke-width="1"/>
+            <text x="68" y="228" text-anchor="middle" font-size="11" fill="#a89ff7">Product</text>
+            <text x="68" y="244" text-anchor="middle" font-size="10" fill="rgba(232,230,240,.45)">Catalog API</text>
+            <rect x="136" y="210" width="108" height="42" rx="6" fill="rgba(124,111,247,.08)" stroke="rgba(124,111,247,.25)" stroke-width="1"/>
+            <text x="190" y="228" text-anchor="middle" font-size="11" fill="#a89ff7">Order</text>
+            <text x="190" y="244" text-anchor="middle" font-size="10" fill="rgba(232,230,240,.45)">Processing</text>
+            <rect x="258" y="210" width="108" height="42" rx="6" fill="rgba(124,111,247,.08)" stroke="rgba(124,111,247,.25)" stroke-width="1"/>
+            <text x="312" y="228" text-anchor="middle" font-size="11" fill="#a89ff7">Payments</text>
+            <text x="312" y="244" text-anchor="middle" font-size="10" fill="rgba(232,230,240,.45)">Stripe</text>
+            <rect x="380" y="210" width="108" height="42" rx="6" fill="rgba(124,111,247,.08)" stroke="rgba(124,111,247,.25)" stroke-width="1"/>
+            <text x="434" y="228" text-anchor="middle" font-size="11" fill="#a89ff7">Search</text>
+            <text x="434" y="244" text-anchor="middle" font-size="10" fill="rgba(232,230,240,.45)">Elasticsearch</text>
+            <rect x="502" y="210" width="100" height="42" rx="6" fill="rgba(124,111,247,.08)" stroke="rgba(124,111,247,.25)" stroke-width="1"/>
+            <text x="552" y="228" text-anchor="middle" font-size="11" fill="#a89ff7">Email</text>
+            <text x="552" y="244" text-anchor="middle" font-size="10" fill="rgba(232,230,240,.45)">Resend</text>
+            <rect x="50" y="318" width="110" height="42" rx="6" fill="rgba(245,166,35,.1)" stroke="rgba(245,166,35,.3)" stroke-width="1"/>
+            <text x="105" y="336" text-anchor="middle" font-size="11" fill="#f5a623">PostgreSQL</text>
+            <text x="105" y="352" text-anchor="middle" font-size="10" fill="rgba(232,230,240,.45)">+ Prisma ORM</text>
+            <rect x="200" y="318" width="110" height="42" rx="6" fill="rgba(240,112,96,.1)" stroke="rgba(240,112,96,.3)" stroke-width="1"/>
+            <text x="255" y="336" text-anchor="middle" font-size="11" fill="#f07060">Redis</text>
+            <text x="255" y="352" text-anchor="middle" font-size="10" fill="rgba(232,230,240,.45)">Cache + sessions</text>
+            <rect x="350" y="318" width="110" height="42" rx="6" fill="rgba(74,158,255,.1)" stroke="rgba(74,158,255,.3)" stroke-width="1"/>
+            <text x="405" y="336" text-anchor="middle" font-size="11" fill="#4a9eff">S3 / R2</text>
+            <text x="405" y="352" text-anchor="middle" font-size="10" fill="rgba(232,230,240,.45)">Product images</text>
+            <rect x="490" y="318" width="100" height="42" rx="6" fill="rgba(93,216,181,.1)" stroke="rgba(93,216,181,.3)" stroke-width="1"/>
+            <text x="540" y="336" text-anchor="middle" font-size="11" fill="#5dd8b5">Kafka</text>
+            <text x="540" y="352" text-anchor="middle" font-size="10" fill="rgba(232,230,240,.45)">Event stream</text>
+            <line x1="310" y1="46" x2="230" y2="68" stroke="rgba(232,230,240,.18)" stroke-width="1" marker-end="url(#ar3)"/>
+            <line x1="310" y1="46" x2="350" y2="68" stroke="rgba(232,230,240,.18)" stroke-width="1" marker-end="url(#ar3)"/>
+            <line x1="345" y1="102" x2="310" y2="130" stroke="rgba(232,230,240,.18)" stroke-width="1" marker-end="url(#ar3)"/>
+            <line x1="260" y1="164" x2="122" y2="208" stroke="rgba(124,111,247,.25)" stroke-width="1" marker-end="url(#ar3)"/>
+            <line x1="290" y1="164" x2="244" y2="208" stroke="rgba(124,111,247,.25)" stroke-width="1" marker-end="url(#ar3)"/>
+            <line x1="320" y1="164" x2="336" y2="208" stroke="rgba(124,111,247,.25)" stroke-width="1" marker-end="url(#ar3)"/>
+            <line x1="350" y1="164" x2="464" y2="208" stroke="rgba(124,111,247,.25)" stroke-width="1" marker-end="url(#ar3)"/>
+            <line x1="370" y1="164" x2="560" y2="208" stroke="rgba(124,111,247,.25)" stroke-width="1" marker-end="url(#ar3)"/>
+            <line x1="105" y1="252" x2="105" y2="316" stroke="rgba(245,166,35,.25)" stroke-width="1" marker-end="url(#ar3)"/>
+            <line x1="190" y1="252" x2="220" y2="316" stroke="rgba(240,112,96,.25)" stroke-width="1" marker-end="url(#ar3)"/>
+            <line x1="312" y1="252" x2="380" y2="316" stroke="rgba(74,158,255,.25)" stroke-width="1" marker-end="url(#ar3)"/>
+            <line x1="434" y1="252" x2="520" y2="316" stroke="rgba(93,216,181,.25)" stroke-width="1" marker-end="url(#ar3)"/>
+            <text x="310" y="394" text-anchor="middle" font-size="11" fill="rgba(232,230,240,.3)">A real e-commerce platform uses every technology in this book</text>
+          </svg>
+        </div>
+        <div class="callout"><div class="cl">Key insight</div><p>Every node on this diagram is a technology covered in this book. Understanding how they connect is what "system design" actually means. You now have the map.</p></div>
+        <div class="ch-nav"><button class="nb" onclick="go('security',null)">← Security</button><button class="nb" onclick="go('aisaas',null)">AI SaaS Architecture →</button></div>
+      </div>
+    </div>
+
+    <!-- AI SAAS ARCH -->
+    <div id="pg-aisaas" class="page">
+      <div class="ch-page">
+        <div class="ch-hdr"><div class="ch-ey">Part 11 · System Design</div><div class="ch-title">AI SaaS Architecture</div><p class="ch-desc">How to architect a modern AI-powered application. The template for the next generation of software products.</p></div>
+        <div class="eco-svg">
+          <svg width="100%" viewBox="0 0 620 380" role="img"><title>AI SaaS architecture diagram</title><desc>Architecture for an AI SaaS showing frontend, AI layer, backend, and storage</desc>
+            <defs><marker id="ar4" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+            <rect x="200" y="12" width="220" height="32" rx="8" fill="rgba(93,216,181,.15)" stroke="rgba(93,216,181,.4)" stroke-width="1"/>
+            <text x="310" y="33" text-anchor="middle" font-size="12" font-weight="600" fill="#5dd8b5">Next.js Frontend (Vercel)</text>
+            <rect x="80" y="68" width="120" height="32" rx="6" fill="rgba(245,166,35,.1)" stroke="rgba(245,166,35,.3)" stroke-width="1"/>
+            <text x="140" y="82" text-anchor="middle" font-size="11" fill="#f5a623">Auth.js / Clerk</text>
+            <text x="140" y="96" text-anchor="middle" font-size="10" fill="rgba(232,230,240,.45)">OAuth, sessions</text>
+            <rect x="240" y="68" width="140" height="32" rx="6" fill="rgba(124,111,247,.1)" stroke="rgba(124,111,247,.3)" stroke-width="1"/>
+            <text x="310" y="82" text-anchor="middle" font-size="11" fill="#a89ff7">Next.js API Routes</text>
+            <text x="310" y="96" text-anchor="middle" font-size="10" fill="rgba(232,230,240,.45)">Serverless functions</text>
+            <rect x="420" y="68" width="120" height="32" rx="6" fill="rgba(93,216,181,.1)" stroke="rgba(93,216,181,.3)" stroke-width="1"/>
+            <text x="480" y="82" text-anchor="middle" font-size="11" fill="#5dd8b5">Stripe</text>
+            <text x="480" y="96" text-anchor="middle" font-size="10" fill="rgba(232,230,240,.45)">Subscriptions</text>
+            <rect x="40" y="144" width="120" height="40" rx="6" fill="rgba(240,112,96,.1)" stroke="rgba(240,112,96,.3)" stroke-width="1"/>
+            <text x="100" y="161" text-anchor="middle" font-size="11" fill="#f07060">Claude / GPT-4o</text>
+            <text x="100" y="177" text-anchor="middle" font-size="10" fill="rgba(232,230,240,.45)">LLM inference</text>
+            <rect x="180" y="144" width="120" height="40" rx="6" fill="rgba(240,112,96,.1)" stroke="rgba(240,112,96,.3)" stroke-width="1"/>
+            <text x="240" y="161" text-anchor="middle" font-size="11" fill="#f07060">Embeddings API</text>
+            <text x="240" y="177" text-anchor="middle" font-size="10" fill="rgba(232,230,240,.45)">Text → vectors</text>
+            <rect x="320" y="144" width="120" height="40" rx="6" fill="rgba(240,112,96,.1)" stroke="rgba(240,112,96,.3)" stroke-width="1"/>
+            <text x="380" y="161" text-anchor="middle" font-size="11" fill="#f07060">Vector Database</text>
+            <text x="380" y="177" text-anchor="middle" font-size="10" fill="rgba(232,230,240,.45)">pgvector / Pinecone</text>
+            <rect x="460" y="144" width="120" height="40" rx="6" fill="rgba(240,112,96,.1)" stroke="rgba(240,112,96,.3)" stroke-width="1"/>
+            <text x="520" y="161" text-anchor="middle" font-size="11" fill="#f07060">AI Streaming</text>
+            <text x="520" y="177" text-anchor="middle" font-size="10" fill="rgba(232,230,240,.45)">WebSockets / SSE</text>
+            <rect x="200" y="228" width="220" height="32" rx="6" fill="rgba(74,158,255,.1)" stroke="rgba(74,158,255,.3)" stroke-width="1"/>
+            <text x="310" y="242" text-anchor="middle" font-size="11" fill="#4a9eff">Background Queue (BullMQ / Redis)</text>
+            <text x="310" y="256" text-anchor="middle" font-size="10" fill="rgba(232,230,240,.45)">Async AI jobs, email, processing</text>
+            <rect x="50" y="298" width="130" height="42" rx="6" fill="rgba(245,166,35,.1)" stroke="rgba(245,166,35,.3)" stroke-width="1"/>
+            <text x="115" y="316" text-anchor="middle" font-size="11" fill="#f5a623">PostgreSQL</text>
+            <text x="115" y="332" text-anchor="middle" font-size="10" fill="rgba(232,230,240,.45)">Users, chats, data</text>
+            <rect x="220" y="298" width="130" height="42" rx="6" fill="rgba(240,112,96,.1)" stroke="rgba(240,112,96,.3)" stroke-width="1"/>
+            <text x="285" y="316" text-anchor="middle" font-size="11" fill="#f07060">Redis</text>
+            <text x="285" y="332" text-anchor="middle" font-size="10" fill="rgba(232,230,240,.45)">Cache, rate limiting</text>
+            <rect x="400" y="298" width="130" height="42" rx="6" fill="rgba(74,158,255,.1)" stroke="rgba(74,158,255,.3)" stroke-width="1"/>
+            <text x="465" y="316" text-anchor="middle" font-size="11" fill="#4a9eff">S3 / R2</text>
+            <text x="465" y="332" text-anchor="middle" font-size="10" fill="rgba(232,230,240,.45)">Files, documents</text>
+            <line x1="270" y1="44" x2="190" y2="66" stroke="rgba(232,230,240,.18)" stroke-width="1" marker-end="url(#ar4)"/>
+            <line x1="310" y1="44" x2="310" y2="66" stroke="rgba(232,230,240,.18)" stroke-width="1" marker-end="url(#ar4)"/>
+            <line x1="350" y1="44" x2="440" y2="66" stroke="rgba(232,230,240,.18)" stroke-width="1" marker-end="url(#ar4)"/>
+            <line x1="280" y1="100" x2="180" y2="142" stroke="rgba(240,112,96,.25)" stroke-width="1" marker-end="url(#ar4)"/>
+            <line x1="300" y1="100" x2="280" y2="142" stroke="rgba(240,112,96,.25)" stroke-width="1" marker-end="url(#ar4)"/>
+            <line x1="330" y1="100" x2="390" y2="142" stroke="rgba(240,112,96,.25)" stroke-width="1" marker-end="url(#ar4)"/>
+            <line x1="350" y1="100" x2="530" y2="142" stroke="rgba(240,112,96,.25)" stroke-width="1" marker-end="url(#ar4)"/>
+            <line x1="240" y1="184" x2="268" y2="226" stroke="rgba(74,158,255,.25)" stroke-width="1" marker-end="url(#ar4)"/>
+            <line x1="285" y1="260" x2="190" y2="296" stroke="rgba(245,166,35,.25)" stroke-width="1" marker-end="url(#ar4)"/>
+            <line x1="310" y1="260" x2="310" y2="296" stroke="rgba(240,112,96,.25)" stroke-width="1" marker-end="url(#ar4)"/>
+            <line x1="340" y1="260" x2="450" y2="296" stroke="rgba(74,158,255,.25)" stroke-width="1" marker-end="url(#ar4)"/>
+            <text x="310" y="366" text-anchor="middle" font-size="11" fill="rgba(232,230,240,.3)">The modern AI SaaS stack — from user to vector database</text>
+          </svg>
+        </div>
+        <div class="callout green"><div class="cl">This is what you can build</div><p>This architecture powers Perplexity, character.ai, Jasper, and thousands of AI startups. Every technology in this diagram is covered in this book. You now have the mental model to understand — and build — all of it.</p></div>
+        <div class="ch-nav"><button class="nb" onclick="go('ecom',null)">← E-Commerce Architecture</button><button class="nb" onclick="go('future',null)">The Future →</button></div>
+      </div>
+    </div>
+
+    <!-- FUTURE -->
+    <div id="pg-future" class="page">
+      <div class="ch-page">
+        <div class="ch-hdr"><div class="ch-ey">Part 12 · The Future</div><div class="ch-title">The Future of Software Engineering</div><p class="ch-desc">AI is changing how software is built. The most important chapter for developers starting today.</p></div>
+        <h2>AI-Assisted Development — it's already here</h2>
+        <p>GitHub Copilot completes your code. Claude Code rewrites entire files. AI reviews your PRs and writes your tests. The question is not "will AI change software development?" — it already has. The question is how to work with it.</p>
+        <div class="cg">
+          <div class="card"><div class="card-t">AI coding assistants</div><div class="card-d">Copilot, Cursor, Claude Code. Write faster, catch bugs earlier.</div></div>
+          <div class="card"><div class="card-t">AI-generated tests</div><div class="card-d">Describe a feature. AI generates the test suite.</div></div>
+          <div class="card"><div class="card-t">AI documentation</div><div class="card-d">Undocumented codebases explained by AI on demand.</div></div>
+          <div class="card"><div class="card-t">AI code review</div><div class="card-d">Catches security vulnerabilities and performance issues automatically.</div></div>
+        </div>
+        <div class="callout green"><div class="cl">What makes a developer valuable in the AI era</div><p><strong>1. System thinking</strong> — understanding how technologies connect (this entire book). AI writes code; humans design systems. <strong>2. Product sense</strong> — knowing what to build and why. <strong>3. Critical review</strong> — evaluating AI output for correctness, security, and elegance. <strong>4. Communication</strong> — translating between what users need and what AI can build.</p></div>
+        <div class="callout amber"><div class="cl">Future Editions — Version 2.0 and beyond</div><p>This section is intentionally expandable. New chapters will be added as these technologies mature: <strong>AI Compilers</strong>, <strong>WebAssembly (WASM)</strong>, <strong>Edge AI inference</strong>, <strong>Vision Language Models</strong>, <strong>AI Operating Systems</strong>, and <strong>A2A (Agent-to-Agent)</strong> communication standards.</p></div>
+        <h2>The timeless skills</h2>
+        <div class="pills"><div class="pill">Systems thinking</div><div class="pill">Debugging mindset</div><div class="pill">First principles reasoning</div><div class="pill">Understanding protocols</div><div class="pill">Architecture patterns</div><div class="pill">Collaboration</div></div>
+        <div style="margin-top:40px;padding:24px;background:var(--sur2);border:1px solid var(--bdr);border-radius:10px;max-width:580px">
+          <div style="font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ac);margin-bottom:10px">Final note from Din</div>
+          <p style="font-size:15px;line-height:1.8;color:rgba(232,230,240,.9);max-width:none;margin:0 0 14px">The software world is large. This book gave you the map. Now explore it. Every technology here was once unfamiliar to someone who is now an expert in it. The only difference between you and them is time spent building.</p>
+          <p style="font-size:15px;line-height:1.8;color:rgba(232,230,240,.9);max-width:none;margin:0">Go build something.</p>
+          <p style="margin:14px 0 0;font-size:13px;color:var(--mu)">— Dinesh Bahadur Shahi (Din) · <strong style="color:var(--tx)">CodeWithDin</strong></p>
+        </div>
+        <div class="ch-nav"><button class="nb" onclick="go('aisaas',null)">← AI SaaS Architecture</button><button class="nb off">End of Book</button></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+</div>
+
+<script>
+const ORDER = ['author','codewithdin','howto','toc','ecosystem','howsoftware','journey','html','css','javascript','typescript','react','nextjs','tailwind','nodejs','apis','graphql','auth','serverless','sql','postgresql','mongodb','redis','dns','vercel','aws','docker','cicd','websockets','kafka','llms','aiapis','rag','agents','payments','analytics','mobile','security','ecom','aisaas','future'];
+
+let started = false;
+
+function go(id, navEl) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  const pg = document.getElementById('pg-' + id);
+  if (pg) { pg.classList.add('active'); }
+  const sc = document.getElementById('scroll');
+  sc.scrollTop = 0;
+  updP();
+  document.querySelectorAll('.ni').forEach(n => n.classList.remove('active'));
+  if (navEl) { navEl.classList.add('active'); }
+  else {
+    const found = document.querySelector('.ni[data-p="'+id+'"]');
+    if (found) found.classList.add('active');
+  }
+  if (window.innerWidth <= 600) document.getElementById('sidebar').classList.remove('open');
+}
+
+function startReading() {
+  started = true;
+  document.getElementById('pg-cover').style.display = 'none';
+  go('author', null);
+}
+
+function updP() {
+  const sc = document.getElementById('scroll');
+  const s = sc.scrollHeight - sc.clientHeight;
+  const pct = s > 0 ? (sc.scrollTop / s) * 100 : 100;
+  document.getElementById('pfill').style.width = Math.min(100, pct) + '%';
+}
+
+function filterNav(v) {
+  v = v.toLowerCase();
+  document.querySelectorAll('.ni').forEach(el => {
+    el.classList.toggle('hidden', !el.textContent.toLowerCase().includes(v));
+  });
+}
+
+document.addEventListener('keydown', e => {
+  if (e.target.tagName === 'INPUT') return;
+  const active = document.querySelector('.page.active');
+  if (!active) return;
+  const id = active.id.replace('pg-', '');
+  const idx = ORDER.indexOf(id);
+  if (e.key === 'ArrowRight' && idx >= 0 && idx < ORDER.length - 1) go(ORDER[idx+1], null);
+  if (e.key === 'ArrowLeft' && idx > 0) go(ORDER[idx-1], null);
+});
+</script>
